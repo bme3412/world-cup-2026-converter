@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: theme("colors.bg");
+  color: theme("colors.ink");
+  font-family: theme("fontFamily.body");
+  -webkit-font-smoothing: antialiased;
+  /* soft royal-blue wash up top + a whisper-faint dot grid for texture */
+  background-image:
+    radial-gradient(130% 90% at 50% -20%, rgba(30, 80, 232, 0.1), transparent 55%),
+    radial-gradient(rgba(30, 80, 232, 0.05) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    22px 22px;
+  background-attachment: fixed;
+}
+
+*:focus-visible {
+  outline: 2px solid theme("colors.berry");
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Board numerals + status colours — solid on the light theme, no glow. */
+.glow-berry {
+  color: theme("colors.berry");
+}
+.glow-free {
+  color: theme("colors.free");
+}
+.glow-paid {
+  color: theme("colors.paid");
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.001ms !important;
+  }
+}
