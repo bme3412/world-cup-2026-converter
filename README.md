@@ -47,14 +47,20 @@ risk a dead link.
   group has its 6 matches (72 total), each team plays 3, no duplicate pairings, and every kickoff/
   timezone is valid. It runs as a **`prebuild` gate** (a broken dataset can't deploy) and in CI on
   every push (`.github/workflows/check.yml`). Update its `EXPECTED_*` constants when knockouts land.
-- **Web Analytics** (Vercel, Pro) — `track()` custom events capture real behavior:
-  - `setup_change` — nationality / service / location picked (which markets & subscriptions matter)
-  - `team_filter` — team added/removed
-  - `share` / `share_failed` — method (native/clipboard) + context
-  - `watch_click` — provider / country / kind tapped (demand + dead-link signal)
-  - `calendar_export` — count / country / match
+- **Web Analytics** (Vercel, Pro) — custom events via `lib/analytics.ts`. Every event carries a
+  consistent context (`watching_country`, `nationality`, `subscription`) **and a `source`**
+  (utm_source or referrer host) so custom events are attributable, not just page views. The funnel
+  is **page view → `ready_to_watch_shown` → `watch_option_clicked` / `calendar_exported` /
+  `share_clicked`** (engagement is *not* defined by setup changes — the default state delivers value):
+  - `ready_to_watch_shown` — the answer rendered (`verdict` + cheapest `option_type`); once per match/session
+  - `watch_option_clicked` — provider + `option_type` (`included` / `free_ota` / `cable_required` / `paid_stream` …)
+  - `source_clicked` · `calendar_exported` · `share_clicked` / `share_failed`
+  - `country_selected` · `subscription_selected` · `nationality_selected` · `team_filter_selected` · `zero_results_shown`
 
-  Page views (including every `/match/[id]`) are tracked automatically. View in **Vercel → Analytics**.
+  Page views (including every `/match/[id]` and `/watch/[country]`) are tracked automatically.
+  **Attribution:** append `?utm_source=…&utm_medium=…&utm_campaign=…` to every shared link — Vercel
+  captures UTMs on page views, and `lib/analytics.ts` folds `utm_source` into every custom event.
+  View both in **Vercel → Analytics**.
 - **Speed Insights** (Vercel) — real-user Core Web Vitals (LCP, CLS, INP, TTFB) via
   `@vercel/speed-insights` mounted in `app/layout.tsx`. View in **Vercel → Speed Insights**.
 - **Share** uses the native Web Share sheet on mobile, falling back to clipboard.

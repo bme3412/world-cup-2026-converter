@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { track } from "@vercel/analytics";
+import { ev, ctxOf, captureEntry } from "@/lib/analytics";
 import { buildCalendar, downloadIcs } from "@/lib/ics";
 import SettingsPanel from "@/components/SettingsPanel";
 import DayStrip, { type DayMeta } from "@/components/DayStrip";
@@ -48,6 +48,7 @@ export default function Page() {
     setFrom(fromCode);
     const s = svc ? SERVICE_BY_ID[svc] : undefined;
     setService(s && (s.homeCountry === fromCode || s.id === "none") ? svc! : defaultServiceFor(fromCode));
+    captureEntry();
     setNow(new Date());
   }, []);
 
@@ -66,6 +67,7 @@ export default function Page() {
   const fromCountry = COUNTRY_BY_CODE[from];
   const svc = SERVICE_BY_ID[service] ?? null;
   const tz = country.tz;
+  const baseCtx = ctxOf(fromCountry, country, svc);
 
   const filtered = useMemo(
     () => (teams.size === 0 ? MATCHES : MATCHES.filter((m) => teams.has(m.home.code) || teams.has(m.away.code))),
@@ -108,6 +110,13 @@ export default function Page() {
     setSelectedDay(firstUpcoming.key);
   }, [days, selectedDay, now]);
 
+  // Rare, but worth knowing: a team filter that yields nothing.
+  useEffect(() => {
+    if (now && teams.size > 0 && days.length === 0) {
+      ev("zero_results_shown", { watching_country: current, team_filter: Array.from(teams).join(",") });
+    }
+  }, [now, days.length, teams, current]);
+
   const dayMetas: DayMeta[] = days.map((d) => {
     const date = new Date(d.matches[0].kickoffUtc);
     const fmt = (opts: Intl.DateTimeFormatOptions) =>
@@ -129,22 +138,22 @@ export default function Page() {
     setFrom(code);
     const s = SERVICE_BY_ID[service];
     if (!s || (s.homeCountry !== code && s.id !== "none")) setService(defaultServiceFor(code));
-    track("setup_change", { field: "nationality", value: code });
+    ev("nationality_selected", { ...baseCtx, nationality: COUNTRY_BY_CODE[code]?.demonym ?? code });
   };
   const handleService = (id: string) => {
     setService(id);
-    track("setup_change", { field: "service", value: id });
+    ev("subscription_selected", { ...baseCtx, subscription: SERVICE_BY_ID[id]?.name ?? "none" });
   };
   const handleCurrent = (code: string) => {
     setCurrent(code);
-    track("setup_change", { field: "location", value: code });
+    ev("country_selected", { ...baseCtx, watching_country: code });
   };
 
   const exportCalendar = () => {
     if (!filtered.length) return;
     const tag = teams.size === 1 ? Array.from(teams)[0].toLowerCase() : "all";
     downloadIcs(`beautifulgame2026-${tag}.ics`, buildCalendar(filtered, country));
-    track("calendar_export", { count: filtered.length, country: current, teams: teams.size });
+    ev("calendar_exported", { ...baseCtx, count: filtered.length, team_filter: Array.from(teams).join(",") || "all" });
   };
 
   const toggleTeam = (code: string) =>
@@ -152,28 +161,25 @@ export default function Page() {
       const next = new Set(prev);
       const added = !next.has(code);
       added ? next.add(code) : next.delete(code);
-      track("team_filter", { team: code, action: added ? "add" : "remove" });
+      ev("team_filter_selected", { ...baseCtx, team_filter: code, action: added ? "add" : "remove" });
       return next;
     });
 
   const share = async () => {
     const url = window.location.href;
-    // Observability: every share attempt is traced with its context + method.
-    const ctx = { from, current, service, teams: teams.size };
     try {
       if (typeof navigator !== "undefined" && navigator.share) {
         await navigator.share({ title: "beautifulgame2026", text: "How to watch the matches", url });
-        track("share", { ...ctx, method: "native" });
+        ev("share_clicked", { ...baseCtx, method: "native" });
         return;
       }
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-      track("share", { ...ctx, method: "clipboard" });
+      ev("share_clicked", { ...baseCtx, method: "clipboard" });
     } catch (e) {
-      // user dismissed the native sheet, or clipboard was blocked
       const reason = e instanceof Error ? e.name : "unknown";
-      if (reason !== "AbortError") track("share_failed", { ...ctx, reason });
+      if (reason !== "AbortError") ev("share_failed", { ...baseCtx, reason });
     }
   };
 

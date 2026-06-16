@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import type { Country, Match, WatchOption } from "@/lib/types";
 import type { Service } from "@/lib/data/services";
-import { track } from "@vercel/analytics";
+import { ev, ctxOf, matchSlug, optionType, type Ctx } from "@/lib/analytics";
 import { cheapestLegal, formatPrice, serviceVerdict } from "@/lib/watch";
 import { formatTime, tzAbbr } from "@/lib/time";
 import { teamColor } from "@/lib/data/teamColors";
@@ -16,6 +17,9 @@ const CHECKED = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
   timeZone: "UTC",
 }).format(new Date(VERIFIED_AT));
+
+// Fire "ready_to_watch_shown" once per match per session (not on every re-render).
+const SHOWN = new Set<string>();
 
 function Crest({ flag, color }: { flag: string; color: string }) {
   return (
@@ -44,13 +48,15 @@ function Chip({ tone, children }: { tone: "free" | "info" | "warn"; children: Re
 function Option({
   o,
   cheapest,
-  countryCode,
+  ctx,
+  matchId,
   serviceCarries,
   serviceName,
 }: {
   o: WatchOption;
   cheapest: boolean;
-  countryCode: string;
+  ctx: Ctx;
+  matchId: string;
   serviceCarries: string[];
   serviceName?: string;
 }) {
@@ -105,14 +111,20 @@ function Option({
             target="_blank"
             rel="noreferrer"
             title={`Open ${o.provider}`}
-            onClick={() => track("watch_click", { provider: o.provider, country: countryCode, kind: o.kind })}
+            onClick={() => ev("watch_option_clicked", { ...ctx, match_id: matchId, provider: o.provider, option_type: optionType(o, included) })}
             className="rounded-md bg-berry px-3 py-1.5 text-xs font-semibold text-white hover:bg-berry/90"
           >
             Open ↗
           </a>
         ) : null}
         {o.sourceUrl ? (
-          <a href={o.sourceUrl} target="_blank" rel="noreferrer" className="text-[10px] text-muted underline hover:text-berry">
+          <a
+            href={o.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => ev("source_clicked", { ...ctx, match_id: matchId, provider: o.provider })}
+            className="text-[10px] text-muted underline hover:text-berry"
+          >
             source
           </a>
         ) : null}
@@ -143,6 +155,23 @@ export default function MatchCard({
   const isAbroad = fromCountry.code !== country.code;
   const euTrip = fromCountry.isEU && country.isEU && !!service?.euPortable;
   const verdict = serviceVerdict(service, isAbroad, homeOptions, euTrip);
+
+  const ctx = ctxOf(fromCountry, country, service);
+  const slug = matchSlug(match);
+  const cheapestIncluded = !!cheapestOpt && (service?.carries.includes(cheapestOpt.provider) ?? false);
+
+  // The funnel's "saw the answer" step — once per match per session.
+  useEffect(() => {
+    if (SHOWN.has(slug)) return;
+    SHOWN.add(slug);
+    ev("ready_to_watch_shown", {
+      ...ctx,
+      match_id: slug,
+      verdict: verdict.state,
+      option_type: cheapestOpt ? optionType(cheapestOpt, cheapestIncluded) : "none",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   const localTime = formatTime(match.kickoffUtc, country.tz);
   const localAbbr = tzAbbr(match.kickoffUtc, country.tz);
@@ -265,7 +294,7 @@ export default function MatchCard({
           <button
             onClick={() => {
               downloadIcs(`${match.id}.ics`, buildCalendar([match], country));
-              track("calendar_export", { count: 1, country: country.code, match: match.id });
+              ev("calendar_exported", { ...ctx, match_id: slug, count: 1 });
             }}
             title="Add this match to your calendar"
             className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-berry hover:underline"
@@ -285,7 +314,8 @@ export default function MatchCard({
                 key={`${o.provider}-${i}`}
                 o={o}
                 cheapest={!!cheapestOpt && o === cheapestOpt}
-                countryCode={country.code}
+                ctx={ctx}
+                matchId={slug}
                 serviceCarries={service?.carries ?? []}
                 serviceName={service && service.id !== "none" ? service.name : undefined}
               />
