@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import TeamStrip from "@/components/TeamStrip";
-import SentenceControls from "@/components/SentenceControls";
+import SettingsPanel from "@/components/SettingsPanel";
 import DayStrip, { type DayMeta } from "@/components/DayStrip";
 import MatchCard from "@/components/MatchCard";
 import { MATCHES } from "@/lib/data/matches";
@@ -97,11 +96,14 @@ export default function Page() {
   }, [days, todayKey, selectedDay, now]);
 
   const dayMetas: DayMeta[] = days.map((d) => {
-    const iso = d.matches[0].kickoffUtc;
+    const date = new Date(d.matches[0].kickoffUtc);
+    const fmt = (opts: Intl.DateTimeFormatOptions) =>
+      new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: tz }).format(date);
     return {
       key: d.key,
-      weekday: new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: tz }).format(new Date(iso)),
-      date: new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", timeZone: tz }).format(new Date(iso)),
+      weekday: fmt({ weekday: "short" }),
+      day: fmt({ day: "2-digit" }),
+      month: fmt({ month: "short" }),
       count: d.matches.length,
       isToday: d.key === todayKey,
     };
@@ -134,83 +136,84 @@ export default function Page() {
   };
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-16">
-      {/* Control deck */}
-      <div className="-mx-4 border-b border-berry/15 bg-wash/85 px-4 pb-3 pt-4 backdrop-blur">
-        <div className="mb-3 flex items-end justify-between gap-3">
-          <div>
-            <h1 className="font-display text-xl tracking-wide sm:text-2xl">
-              BEAUTIFULGAME<span className="text-berry">2026</span>
-            </h1>
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">
-              Summer 2026 · how to watch
-            </p>
-          </div>
-          <button
-            onClick={share}
-            className="shrink-0 rounded-md border border-line bg-panel px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-muted hover:border-berry/40 hover:text-ink"
-          >
-            {copied ? "copied ✓" : "share"}
-          </button>
-        </div>
-
-        <SentenceControls
-          from={from}
-          service={service}
-          current={current}
-          onFrom={handleFrom}
-          onService={setService}
-          onCurrent={setCurrent}
-        />
-        <div className="mt-3">
-          <TeamStrip
-            selected={teams}
-            onToggle={toggleTeam}
-            onAll={() => setTeams(new Set(ALL_TEAMS))}
-            onNone={() => setTeams(new Set())}
-          />
-        </div>
-      </div>
-
-      {/* Day picker + the selected day's games */}
-      <section className="pt-4">
-        {!now ? (
-          <p className="py-16 text-center font-mono text-sm text-muted">loading…</p>
-        ) : teams.size === 0 ? (
-          <p className="py-16 text-center font-mono text-sm text-muted">
-            Select a team above to see match days.
+    <main className="mx-auto max-w-6xl px-4 pb-16 lg:px-6">
+      {/* brand bar */}
+      <header className="flex items-center justify-between gap-3 py-4">
+        <div>
+          <h1 className="font-display text-xl tracking-wide sm:text-2xl">
+            BEAUTIFULGAME<span className="text-berry">2026</span>
+          </h1>
+          <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+            Summer 2026 · how to watch
           </p>
-        ) : !activeDay ? (
-          <p className="py-16 text-center font-mono text-sm text-muted">No matches for your teams.</p>
-        ) : (
-          <>
-            <DayStrip days={dayMetas} selected={selectedDay} onSelect={setSelectedDay} />
+        </div>
+        <button
+          onClick={share}
+          className="shrink-0 rounded-lg border border-line bg-panel px-4 py-2 font-mono text-[11px] uppercase tracking-wide text-muted hover:border-berry/40 hover:text-ink"
+        >
+          {copied ? "copied ✓" : "↗ share"}
+        </button>
+      </header>
 
-            <div className="mb-3 mt-4 flex items-baseline justify-between gap-2 px-1">
-              <h2 className="font-display text-xl tracking-wide sm:text-2xl">
-                {formatDateLong(activeDay.matches[0].kickoffUtc, tz)}
-              </h2>
-              <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">
-                times in {country.name}
-              </span>
-            </div>
+      <div className="lg:flex lg:items-start lg:gap-6">
+        {/* settings sidebar */}
+        <aside className="lg:w-72 lg:shrink-0">
+          <div className="lg:sticky lg:top-4">
+            <SettingsPanel
+              from={from}
+              service={service}
+              current={current}
+              onFrom={handleFrom}
+              onService={setService}
+              onCurrent={setCurrent}
+              teams={teams}
+              onToggle={toggleTeam}
+              onAll={() => setTeams(new Set(ALL_TEAMS))}
+              onNone={() => setTeams(new Set())}
+            />
+          </div>
+        </aside>
 
-            <div className="flex flex-col gap-3">
-              {activeDay.matches.map((m) => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  country={country}
-                  fromCountry={fromCountry}
-                  service={svc}
-                  options={getOptions(RIGHTS, current, m.id)}
-                  homeOptions={getOptions(RIGHTS, from, m.id)}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+        {/* day picker + the selected day's games */}
+        <section className="min-w-0 flex-1 pt-5 lg:pt-0">
+          {!now ? (
+            <p className="py-16 text-center font-mono text-sm text-muted">loading…</p>
+          ) : teams.size === 0 ? (
+            <p className="py-16 text-center font-mono text-sm text-muted">
+              Select a team in Settings to see match days.
+            </p>
+          ) : !activeDay ? (
+            <p className="py-16 text-center font-mono text-sm text-muted">No matches for your teams.</p>
+          ) : (
+            <>
+              <DayStrip days={dayMetas} selected={selectedDay} onSelect={setSelectedDay} />
+
+              <div className="mb-3 mt-4 flex items-baseline justify-between gap-2 px-1">
+                <h2 className="font-display text-xl tracking-wide sm:text-2xl">
+                  {formatDateLong(activeDay.matches[0].kickoffUtc, tz)}
+                </h2>
+                <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">
+                  times in {country.name}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {activeDay.matches.map((m) => (
+                  <MatchCard
+                    key={m.id}
+                    match={m}
+                    country={country}
+                    fromCountry={fromCountry}
+                    service={svc}
+                    options={getOptions(RIGHTS, current, m.id)}
+                    homeOptions={getOptions(RIGHTS, from, m.id)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      </div>
 
       <footer className="mt-10 border-t border-line pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
         <span className="text-free">✓ Rights verified 15 Jun 2026</span> · every claim sourced ·

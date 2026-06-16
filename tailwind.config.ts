@@ -16,6 +16,7 @@ const config: Config = {
         berry: "#1E50E8", // vibrant royal blue accent
         free: "#11875A", // free-to-air (readable on white)
         paid: "#CD3A24", // paid (readable on white)
+        gold: "#A9772A", // caution / "home service blocked" pill
       },
       fontFamily: {
         display: ["var(--font-anton)", "sans-serif"],

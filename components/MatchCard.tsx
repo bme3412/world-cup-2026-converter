@@ -4,6 +4,7 @@ import type { Country, Match, WatchOption } from "@/lib/types";
 import type { Service } from "@/lib/data/services";
 import { cheapestLegal, formatPrice, serviceVerdict } from "@/lib/watch";
 import { formatTime, tzAbbr } from "@/lib/time";
+import { teamColor } from "@/lib/data/teamColors";
 
 function Tag({ tone, children }: { tone: "free" | "paid" | "muted" | "berry"; children: React.ReactNode }) {
   const map = {
@@ -16,6 +17,17 @@ function Tag({ tone, children }: { tone: "free" | "paid" | "muted" | "berry"; ch
     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${map[tone]}`}>
       {children}
     </span>
+  );
+}
+
+function Crest({ flag, color }: { flag: string; color: string }) {
+  return (
+    <div
+      className="flex h-12 w-12 items-center justify-center rounded-full border-[3px] bg-white text-2xl shadow-sm sm:h-16 sm:w-16 sm:text-4xl"
+      style={{ borderColor: color }}
+    >
+      <span>{flag}</span>
+    </div>
   );
 }
 
@@ -39,7 +51,7 @@ function Option({ o, cheapest }: { o: WatchOption; cheapest: boolean }) {
         ) : o.price ? (
           <span className="text-paid">{formatPrice(o.price)}</span>
         ) : (
-          <span className="text-muted">login required</span>
+          <span className="text-muted">subscription</span>
         )}
       </span>
       <span className="font-mono text-[11px] uppercase tracking-wide text-muted">
@@ -51,13 +63,7 @@ function Option({ o, cheapest }: { o: WatchOption; cheapest: boolean }) {
         {o.confidence === "verified" ? "✓ Verified" : o.confidence === "unknown" ? "Unverified" : "Sample"}
       </Tag>
       {o.sourceUrl ? (
-        <a
-          href={o.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="text-[11px] text-berry underline"
-        >
+        <a href={o.sourceUrl} target="_blank" rel="noreferrer" className="text-[11px] text-berry underline">
           source
         </a>
       ) : null}
@@ -84,7 +90,6 @@ export default function MatchCard({
   const cheapest = cheapestLegal(options);
   const cheapestOpt = cheapest.kind === "unknown" ? null : cheapest.option;
   const isAbroad = fromCountry.code !== country.code;
-  // EU cross-border portability: paid EU sub, travelling within the EU.
   const euTrip = fromCountry.isEU && country.isEU && !!service?.euPortable;
   const verdict = serviceVerdict(service, isAbroad, homeOptions, euTrip);
 
@@ -92,66 +97,105 @@ export default function MatchCard({
   const localAbbr = tzAbbr(match.kickoffUtc, country.tz);
   const venueTime = formatTime(match.kickoffUtc, match.venueTz);
 
-  // The headline answer for a travelling fan.
-  let banner: { tone: "ok" | "bad" | "info"; text: string } | null = null;
+  const cheapestLabel =
+    cheapest.kind === "free"
+      ? "FREE"
+      : cheapest.kind === "unknown"
+        ? "Check local listings"
+        : cheapestOpt?.price
+          ? formatPrice(cheapestOpt.price)
+          : "Subscription";
+  const cheapestProvider = cheapestOpt?.provider ?? "no listed option";
+
+  // The headline pill — same legal verdict, styled like the reference (no VPN copy).
+  type Pill = { tone: "ok" | "warn" | "info"; icon: string; title: string; sub: string };
+  let pill: Pill;
   if (verdict.state === "works") {
-    banner = {
+    pill = {
       tone: "ok",
-      text: verdict.portable
-        ? `✓ Your ${service!.name} works in ${country.name} via EU cross-border portability${verdict.via ? ` — on ${verdict.via}` : ""}`
-        : `✓ Your ${service!.name} works in ${country.name}${verdict.via ? ` — on ${verdict.via}` : ""}`,
+      icon: "✓",
+      title: "Ready to watch",
+      sub: verdict.portable
+        ? `${service!.name} works here via EU portability`
+        : `Watch on ${verdict.via ?? service!.name}`,
     };
   } else if (verdict.state === "blocked") {
-    banner = {
-      tone: "bad",
-      text: `✗ Your ${service!.name} is ${fromCountry.name}-only — it won't work in ${country.name}. Best legal option here ↓`,
+    pill = {
+      tone: "warn",
+      icon: "⚠",
+      title: `${service!.name} won't work here`,
+      sub: cheapest.kind === "unknown" ? "Check local listings" : `Watch on ${cheapestProvider} instead`,
     };
   } else if (verdict.state === "no-coverage") {
-    banner = {
+    pill = {
       tone: "info",
-      text: `Your ${service!.name} doesn't carry this match — use an option below`,
+      icon: "•",
+      title: `Not on your ${service!.name}`,
+      sub: cheapest.kind === "unknown" ? "Check local listings" : `Watch on ${cheapestProvider}`,
+    };
+  } else {
+    // no subscription selected → surface the cheapest legal option
+    pill = {
+      tone: cheapest.kind === "free" ? "ok" : cheapest.kind === "unknown" ? "info" : "info",
+      icon: cheapest.kind === "free" ? "✓" : "▶",
+      title: cheapest.kind === "free" ? "Free to watch" : cheapest.kind === "unknown" ? "Check local listings" : `Cheapest · ${cheapestLabel}`,
+      sub: cheapest.kind === "unknown" ? "no verified broadcaster on file" : `on ${cheapestProvider}`,
     };
   }
-  const bannerClass =
-    banner?.tone === "ok"
+  const pillClass =
+    pill.tone === "ok"
       ? "border-free/30 bg-free/10 text-free"
-      : banner?.tone === "bad"
-        ? "border-paid/30 bg-paid/10 text-paid"
-        : "border-berry/25 bg-berry/[0.06] text-ink";
+      : pill.tone === "warn"
+        ? "border-gold/30 bg-gold/10 text-gold"
+        : "border-berry/25 bg-berry/[0.07] text-berry";
+
+  const homeColor = teamColor(match.home.code);
+  const awayColor = teamColor(match.away.code);
 
   return (
-    <article className="overflow-hidden rounded-xl border border-line bg-panel shadow-sm">
-      {/* Header: time + fixture */}
-      <div className="flex items-center gap-3 px-4 py-3.5 sm:gap-4 sm:px-5">
-        <div className="w-[4.75rem] shrink-0 sm:w-[5.5rem]">
-          <div className="font-mono text-2xl font-semibold leading-none text-berry sm:text-[2rem]">
-            {localTime}
+    <article className="relative overflow-hidden rounded-2xl border border-line bg-panel shadow-sm">
+      {/* diagonal team-colour accents behind each crest */}
+      <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: homeColor, clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
+      <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: awayColor, clipPath: "polygon(100% 0, 0 0, 100% 100%)" }} />
+
+      <div className="relative px-3 pt-5 sm:px-6 sm:pt-6">
+        {/* crests + center time */}
+        <div className="grid grid-cols-[auto_auto_1fr_auto_auto] items-center gap-1 sm:gap-3">
+          <div className="flex w-14 flex-col items-center gap-1.5 sm:w-24">
+            <Crest flag={match.home.flag} color={homeColor} />
+            <span className="text-center text-[10px] font-bold uppercase leading-tight text-ink sm:text-xs">{match.home.name}</span>
           </div>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-muted">{localAbbr}</div>
+          <span className="font-display text-sm text-muted sm:text-base">VS</span>
+          <div className="flex flex-col items-center text-center">
+            <div className="font-display text-3xl leading-none text-ink sm:text-[2.5rem]">{localTime}</div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-muted">
+              {localAbbr} · kicks off {venueTime} local
+            </div>
+          </div>
+          <span className="font-display text-sm text-muted sm:text-base">VS</span>
+          <div className="flex w-14 flex-col items-center gap-1.5 sm:w-24">
+            <Crest flag={match.away.flag} color={awayColor} />
+            <span className="text-center text-[10px] font-bold uppercase leading-tight text-ink sm:text-xs">{match.away.name}</span>
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 font-display text-lg leading-none tracking-wide sm:gap-2 sm:text-2xl">
-            <span className="text-sm sm:text-lg">{match.home.flag}</span>
-            <span>{match.home.code}</span>
-            <span className="text-muted">v</span>
-            <span>{match.away.code}</span>
-            <span className="text-sm sm:text-lg">{match.away.flag}</span>
+
+        {/* status pill */}
+        <div className={`mx-auto mt-4 flex max-w-md items-center justify-center gap-2.5 rounded-xl border px-4 py-2.5 ${pillClass}`}>
+          <span className="text-lg leading-none" aria-hidden>{pill.icon}</span>
+          <div className="text-left">
+            <div className="font-display text-sm uppercase leading-none tracking-wide sm:text-base">{pill.title}</div>
+            <div className="mt-1 text-[11px] font-medium opacity-90">{pill.sub}</div>
           </div>
-          <div className="mt-1.5 truncate font-mono text-[11px] uppercase tracking-wide text-muted">
-            {match.stage} · {match.venueCity} · KO {venueTime} local
-          </div>
+        </div>
+
+        {/* pipe meta row */}
+        <div className="mt-4 border-t border-line pt-2 text-center font-mono text-[10px] uppercase tracking-wide text-muted">
+          {localTime} {localAbbr} | {match.stage} | {match.venueCity} | KO {venueTime} local
         </div>
       </div>
 
-      {/* The answer */}
-      {banner ? (
-        <div className={`mx-4 mb-3 rounded-lg border px-3 py-2 text-sm font-semibold sm:mx-5 ${bannerClass}`}>
-          {banner.text}
-        </div>
-      ) : null}
-
-      {/* Always-visible ways to watch */}
-      <div className="border-t border-line bg-wash/40 px-4 py-3 sm:px-5">
+      {/* always-visible ways to watch */}
+      <div className="relative border-t border-line bg-wash/40 px-3 py-3 sm:px-6">
         <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted">
           Ways to watch in {country.name}
         </div>
