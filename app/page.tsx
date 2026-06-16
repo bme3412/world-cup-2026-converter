@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { track } from "@vercel/analytics";
 import SettingsPanel from "@/components/SettingsPanel";
 import DayStrip, { type DayMeta } from "@/components/DayStrip";
 import MatchCard from "@/components/MatchCard";
@@ -137,12 +138,23 @@ export default function Page() {
     });
 
   const share = async () => {
+    const url = window.location.href;
+    // Observability: every share attempt is traced with its context + method.
+    const ctx = { from, current, service, teams: teams.size };
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title: "beautifulgame2026", text: "How to watch the matches", url });
+        track("share", { ...ctx, method: "native" });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* clipboard blocked */
+      track("share", { ...ctx, method: "clipboard" });
+    } catch (e) {
+      // user dismissed the native sheet, or clipboard was blocked
+      const reason = e instanceof Error ? e.name : "unknown";
+      if (reason !== "AbortError") track("share_failed", { ...ctx, reason });
     }
   };
 

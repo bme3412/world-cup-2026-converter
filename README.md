@@ -33,10 +33,23 @@ npm run build    # production build (what Vercel runs)
 **58 viewing countries** across North & South America, Europe, Africa, the Middle East,
 Asia and Oceania — each with sourced country-level rights. The "I'm from / watching in"
 dropdowns are **grouped by region** (`countriesByRegion()`) so the list stays scannable.
-All **48 nations** are selectable in the team filter (with a **search box**), covering every
-group-stage fixture in the dataset. Unknown match×country combinations show "check local
-listings", never a guess. Most options carry a direct **Watch** link to the broadcaster's
-official streaming page (`lib/data/watchUrls.ts`); a few are omitted rather than risk a dead link.
+All **48 nations** are selectable in the team filter (with a **search box**). The dataset holds
+the **complete 72-match group stage** (every group's six fixtures), so a given day shows *all*
+its games — not just the ones involving popular teams. Unknown match×country combinations show
+"check local listings", never a guess. Most options carry a direct **Watch** link to the
+broadcaster's official streaming page (`lib/data/watchUrls.ts`); a few are omitted rather than
+risk a dead link.
+
+## Observability & monitoring
+
+- **Fixture completeness** — `npm run check:fixtures` (`scripts/check-fixtures.ts`) verifies every
+  group has its 6 matches (72 total), each team plays 3, no duplicate pairings, and every kickoff/
+  timezone is valid. It runs as a **`prebuild` gate** (a broken dataset can't deploy) and in CI on
+  every push (`.github/workflows/check.yml`). Update its `EXPECTED_*` constants when knockouts land.
+- **Product analytics** — Vercel Analytics custom events trace real usage: `share` (with method
+  native/clipboard + context), `share_failed`, and `watch_click` (which provider/country a user
+  taps). See `app/page.tsx` and `components/MatchCard.tsx`.
+- **Share** uses the native Web Share sheet on mobile, falling back to clipboard.
 
 ## Time-aware day view
 

@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "tsx scripts/check-fixtures.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check:fixtures": "tsx scripts/check-fixtures.ts",
     "refresh": "tsx scripts/refresh/run.ts"
   },
   "dependencies": {

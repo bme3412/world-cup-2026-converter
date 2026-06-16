@@ -2,6 +2,7 @@
 
 import type { Country, Match, WatchOption } from "@/lib/types";
 import type { Service } from "@/lib/data/services";
+import { track } from "@vercel/analytics";
 import { cheapestLegal, formatPrice, serviceVerdict } from "@/lib/watch";
 import { formatTime, tzAbbr } from "@/lib/time";
 import { teamColor } from "@/lib/data/teamColors";
@@ -18,7 +19,7 @@ function Crest({ flag, color }: { flag: string; color: string }) {
   );
 }
 
-function Option({ o, cheapest }: { o: WatchOption; cheapest: boolean }) {
+function Option({ o, cheapest, countryCode }: { o: WatchOption; cheapest: boolean; countryCode: string }) {
   const url = watchUrl(o.provider);
   const priceLabel = o.kind === "free" ? "FREE" : o.price ? formatPrice(o.price) : "SUB";
   return (
@@ -61,6 +62,7 @@ function Option({ o, cheapest }: { o: WatchOption; cheapest: boolean }) {
             href={url}
             target="_blank"
             rel="noreferrer"
+            onClick={() => track("watch_click", { provider: o.provider, country: countryCode, kind: o.kind })}
             className="rounded-md bg-berry px-3 py-1.5 text-xs font-semibold text-white hover:bg-berry/90"
           >
             Watch ↗
@@ -234,7 +236,7 @@ export default function MatchCard({
         ) : (
           <ul className="flex flex-col gap-2">
             {options.map((o, i) => (
-              <Option key={`${o.provider}-${i}`} o={o} cheapest={!!cheapestOpt && o === cheapestOpt} />
+              <Option key={`${o.provider}-${i}`} o={o} cheapest={!!cheapestOpt && o === cheapestOpt} countryCode={country.code} />
             ))}
           </ul>
         )}
