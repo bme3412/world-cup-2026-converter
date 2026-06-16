@@ -3,7 +3,7 @@
 import { countriesByRegion } from "@/lib/data/countries";
 import type { Country } from "@/lib/types";
 import { servicesForCountry } from "@/lib/data/services";
-import TeamStrip from "@/components/TeamStrip";
+import TeamFilter from "@/components/TeamFilter";
 
 function CountryOptions({ label }: { label: (c: Country) => string }) {
   return (
@@ -65,8 +65,7 @@ export default function SettingsPanel({
   onCurrent,
   teams,
   onToggle,
-  onAll,
-  onNone,
+  onClear,
 }: {
   from: string;
   service: string;
@@ -76,8 +75,7 @@ export default function SettingsPanel({
   onCurrent: (v: string) => void;
   teams: Set<string>;
   onToggle: (code: string) => void;
-  onAll: () => void;
-  onNone: () => void;
+  onClear: () => void;
 }) {
   const myServices = servicesForCountry(from);
   return (
@@ -107,7 +105,7 @@ export default function SettingsPanel({
       </div>
 
       <div className="mt-5 border-t border-line pt-4">
-        <TeamStrip selected={teams} onToggle={onToggle} onAll={onAll} onNone={onNone} />
+        <TeamFilter selected={teams} onToggle={onToggle} onClear={onClear} />
       </div>
     </div>
   );

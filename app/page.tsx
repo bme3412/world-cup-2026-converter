@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { buildCalendar, downloadIcs } from "@/lib/ics";
 import SettingsPanel from "@/components/SettingsPanel";
 import DayStrip, { type DayMeta } from "@/components/DayStrip";
 import MatchCard from "@/components/MatchCard";
 import { MATCHES } from "@/lib/data/matches";
-import { TEAMS } from "@/lib/data/teams";
 import { COUNTRY_BY_CODE } from "@/lib/data/countries";
 import { SERVICE_BY_ID, defaultServiceFor } from "@/lib/data/services";
 import { RIGHTS } from "@/lib/data/rights";
 import { getOptions } from "@/lib/watch";
 import { dayKey, formatDateLong } from "@/lib/time";
 
-const ALL_TEAMS = TEAMS.map((t) => t.code);
 const DEFAULT_COUNTRY = "US";
 const DEFAULT_SERVICE = "ytv";
 const LIVE_WINDOW_MS = 120 * 60 * 1000; // ~2h: a match is "live" within this of kickoff
@@ -26,7 +26,7 @@ function matchStatus(kickoffUtc: string, nowMs: number): "upcoming" | "live" | "
 }
 
 export default function Page() {
-  const [teams, setTeams] = useState<Set<string>>(new Set(ALL_TEAMS));
+  const [teams, setTeams] = useState<Set<string>>(new Set()); // empty = show all
   const [from, setFrom] = useState(DEFAULT_COUNTRY); // "I'm from"
   const [service, setService] = useState(DEFAULT_SERVICE); // "I have"
   const [current, setCurrent] = useState(DEFAULT_COUNTRY); // "watching from"
@@ -53,7 +53,7 @@ export default function Page() {
   useEffect(() => {
     if (!now) return;
     const p = new URLSearchParams();
-    if (teams.size && teams.size < ALL_TEAMS.length) p.set("teams", Array.from(teams).join(","));
+    if (teams.size) p.set("teams", Array.from(teams).join(","));
     p.set("loc", current);
     if (from && from !== current) p.set("from", from);
     if (service !== defaultServiceFor(from)) p.set("svc", service);
@@ -67,7 +67,7 @@ export default function Page() {
   const tz = country.tz;
 
   const filtered = useMemo(
-    () => MATCHES.filter((m) => teams.has(m.home.code) || teams.has(m.away.code)),
+    () => (teams.size === 0 ? MATCHES : MATCHES.filter((m) => teams.has(m.home.code) || teams.has(m.away.code))),
     [teams],
   );
 
@@ -128,6 +128,13 @@ export default function Page() {
     setFrom(code);
     const s = SERVICE_BY_ID[service];
     if (!s || (s.homeCountry !== code && s.id !== "none")) setService(defaultServiceFor(code));
+  };
+
+  const exportCalendar = () => {
+    if (!filtered.length) return;
+    const tag = teams.size === 1 ? Array.from(teams)[0].toLowerCase() : "all";
+    downloadIcs(`beautifulgame2026-${tag}.ics`, buildCalendar(filtered, country));
+    track("calendar_export", { count: filtered.length, country: current, teams: teams.size });
   };
 
   const toggleTeam = (code: string) =>
@@ -191,8 +198,7 @@ export default function Page() {
               onCurrent={setCurrent}
               teams={teams}
               onToggle={toggleTeam}
-              onAll={() => setTeams(new Set(ALL_TEAMS))}
-              onNone={() => setTeams(new Set())}
+              onClear={() => setTeams(new Set())}
             />
           </div>
         </aside>
@@ -201,23 +207,28 @@ export default function Page() {
         <section className="min-w-0 flex-1 pt-5 lg:pt-0">
           {!now ? (
             <p className="py-16 text-center font-mono text-sm text-muted">loading…</p>
-          ) : teams.size === 0 ? (
-            <p className="py-16 text-center font-mono text-sm text-muted">
-              Select a team in Settings to see match days.
-            </p>
           ) : !activeDay ? (
             <p className="py-16 text-center font-mono text-sm text-muted">No matches for your teams.</p>
           ) : (
             <>
               <DayStrip days={dayMetas} selected={selectedDay} onSelect={setSelectedDay} />
 
-              <div className="mb-3 mt-4 flex items-baseline justify-between gap-2 px-1">
+              <div className="mb-3 mt-4 flex flex-wrap items-center justify-between gap-2 px-1">
                 <h2 className="font-display text-xl tracking-wide sm:text-2xl">
                   {formatDateLong(activeDay.matches[0].kickoffUtc, tz)}
                 </h2>
-                <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">
-                  times in {country.name}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={exportCalendar}
+                    title="Download an .ics with 1-hour reminders"
+                    className="rounded-lg border border-line bg-panel px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-berry hover:border-berry/40"
+                  >
+                    📅 {teams.size === 1 ? `Add ${Array.from(teams)[0]} matches` : "Add to calendar"}
+                  </button>
+                  <span className="font-mono text-[11px] uppercase tracking-wide text-muted">
+                    times in {country.name}
+                  </span>
+                </div>
               </div>
 
               {(() => {
@@ -275,6 +286,7 @@ export default function Page() {
       </div>
 
       <footer className="mt-10 border-t border-line pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+        <Link href="/match" className="text-berry hover:underline">All fixtures</Link> ·{" "}
         <span className="text-free">✓ Rights verified 15 Jun 2026</span> · every claim sourced ·
         legal paths only · no VPNs · prices change — check the source
       </footer>

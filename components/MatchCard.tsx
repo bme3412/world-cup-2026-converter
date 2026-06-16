@@ -7,6 +7,7 @@ import { cheapestLegal, formatPrice, serviceVerdict } from "@/lib/watch";
 import { formatTime, tzAbbr } from "@/lib/time";
 import { teamColor } from "@/lib/data/teamColors";
 import { watchUrl } from "@/lib/data/watchUrls";
+import { buildCalendar, downloadIcs } from "@/lib/ics";
 
 function Crest({ flag, color }: { flag: string; color: string }) {
   return (
@@ -225,8 +226,20 @@ export default function MatchCard({
 
       {/* always-visible ways to watch */}
       <div className="relative border-t border-line bg-wash/40 px-3 py-3 sm:px-6">
-        <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted">
-          Ways to watch in {country.name}
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            Ways to watch in {country.name}
+          </span>
+          <button
+            onClick={() => {
+              downloadIcs(`${match.id}.ics`, buildCalendar([match], country));
+              track("calendar_export", { count: 1, country: country.code, match: match.id });
+            }}
+            title="Add this match to your calendar"
+            className="font-mono text-[10px] uppercase tracking-wide text-berry hover:underline"
+          >
+            📅 add
+          </button>
         </div>
         {options.length === 0 ? (
           <p className="text-sm text-muted">

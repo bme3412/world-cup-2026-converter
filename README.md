@@ -2,8 +2,9 @@
 
 **"Can I watch this match — where, and for how much?"** Tell it your nationality,
 what subscription you have, and where you're watching from. It shows that day's
-matches in your local time with the cheapest legal way to watch — and whether
-your home subscription will work where you are.
+matches in your local time with the cheapest legal way to watch — whether your
+home subscription will work where you are — and lets you **add matches to your
+calendar** with reminders.
 
 Live at **[beautifulgame2026.com](https://beautifulgame2026.com)**.
 
@@ -50,6 +51,30 @@ risk a dead link.
   native/clipboard + context), `share_failed`, and `watch_click` (which provider/country a user
   taps). See `app/page.tsx` and `components/MatchCard.tsx`.
 - **Share** uses the native Web Share sheet on mobile, falling back to clipboard.
+
+## SEO
+
+- **Per-match pages** — `/match/[id]` are statically generated (SSG, one per fixture) with
+  `SportsEvent` JSON-LD, kickoff times across major timezones, and a where-to-watch table for every
+  market. These target "Team vs Team — where to watch / TV channels" long-tail queries.
+- **`/match`** — a static fixtures index linking every match (crawlable internal linking).
+- **`robots.ts` + `sitemap.ts`** — sitemap lists the homepage, the index, and all 72 match pages.
+- **OG / Twitter cards** — `app/opengraph-image.tsx` renders a branded card via `next/og`; metadata
+  set in `app/layout.tsx`.
+- (Titles are trademark-safe — no "World Cup" — so we forgo those queries but keep the match/country
+  long-tail.)
+
+## Calendar
+
+`lib/ics.ts` builds an `.ics` (client-side) with a 1-hour reminder per match and the cheapest
+legal way to watch baked into the event. A per-match "📅 add" and a bulk "Add all [team] matches"
+button download it; exports are traced via the `calendar_export` analytics event.
+
+## Filter
+
+Empty filter = **show all** (the default). You see a search box + a few popular quick-picks, and the
+teams you choose appear as removable chips — never a wall of 48. Country dropdowns are region-grouped
+and alphabetized within each group.
 
 ## Time-aware day view
 

@@ -61,6 +61,9 @@ export const TEAMS: Team[] = [...FEATURED, ...OPPONENTS].sort((a, b) =>
   a.code.localeCompare(b.code),
 );
 
+// The most-followed teams, offered as quick-pick chips in the filter.
+export const POPULAR_TEAMS: Team[] = FEATURED;
+
 export const TEAM_BY_CODE: Record<string, Team> = Object.fromEntries(
   TEAMS.map((t) => [t.code, t]),
 );
