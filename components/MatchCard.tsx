@@ -8,6 +8,14 @@ import { formatTime, tzAbbr } from "@/lib/time";
 import { teamColor } from "@/lib/data/teamColors";
 import { watchUrl } from "@/lib/data/watchUrls";
 import { buildCalendar, downloadIcs } from "@/lib/ics";
+import { VERIFIED_AT } from "@/lib/data/rights";
+
+const CHECKED = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(VERIFIED_AT));
 
 function Crest({ flag, color }: { flag: string; color: string }) {
   return (
@@ -20,62 +28,91 @@ function Crest({ flag, color }: { flag: string; color: string }) {
   );
 }
 
-function Option({ o, cheapest, countryCode }: { o: WatchOption; cheapest: boolean; countryCode: string }) {
+function Chip({ tone, children }: { tone: "free" | "info" | "warn"; children: React.ReactNode }) {
+  const map = {
+    free: "bg-free/10 text-free",
+    info: "bg-berry/10 text-berry",
+    warn: "bg-gold/10 text-gold",
+  } as const;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${map[tone]}`}>
+      {children}
+    </span>
+  );
+}
+
+function Option({
+  o,
+  cheapest,
+  countryCode,
+  serviceCarries,
+  serviceName,
+}: {
+  o: WatchOption;
+  cheapest: boolean;
+  countryCode: string;
+  serviceCarries: string[];
+  serviceName?: string;
+}) {
   const url = watchUrl(o.provider);
-  const priceLabel = o.kind === "free" ? "FREE" : o.price ? formatPrice(o.price) : "SUB";
+  const note = (o.note ?? "").toLowerCase();
+  const included = serviceCarries.includes(o.provider);
+
+  // Precise eligibility pill — never a bare "FREE" that hides the catch.
+  let pill: { text: string; cls: string };
+  if (included) {
+    pill = { text: "Included", cls: "bg-free/15 text-free ring-1 ring-free/30" };
+  } else if (o.kind === "free") {
+    const t = /over-the-air|antenna/.test(note) ? "Free OTA" : /\bads\b/.test(note) ? "Free · ads" : "Free";
+    pill = { text: t, cls: "bg-free/12 text-free" };
+  } else if (o.kind === "paid") {
+    pill = { text: o.price ? formatPrice(o.price) : "Subscription", cls: "bg-paid/10 text-paid" };
+  } else {
+    pill = { text: "—", cls: "bg-muted/10 text-muted" };
+  }
+
   return (
     <li
       className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${
         cheapest ? "border-free/50 bg-free/[0.05]" : "border-line bg-panel"
       }`}
     >
-      {/* price pill */}
-      <span
-        className={`shrink-0 rounded-md px-2 py-1 font-mono text-xs font-bold ${
-          o.kind === "free" ? "bg-free/12 text-free" : "bg-paid/10 text-paid"
-        }`}
-      >
-        {priceLabel}
+      <span className={`shrink-0 rounded-md px-2 py-1 text-center font-mono text-xs font-bold ${pill.cls}`}>
+        {pill.text}
       </span>
 
-      {/* provider + meta */}
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="font-semibold text-ink">{o.provider}</span>
+          {included && serviceName ? <Chip tone="free">with {serviceName}</Chip> : null}
           {cheapest ? <span className="text-[10px] font-bold uppercase tracking-wide text-free">★ cheapest</span> : null}
           <span className="font-mono text-[10px] uppercase tracking-wide text-muted">
             {o.delivery.map((x) => (x === "tv" ? "TV" : "Stream")).join(" · ")}
           </span>
-          {o.confidence !== "verified" ? (
-            <span className="font-mono text-[10px] uppercase tracking-wide text-gold">unverified</span>
-          ) : null}
-          {o.travelsWithUser ? (
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-free">✈ travels</span>
-          ) : null}
+          {/cable|tv-provider|tv provider|login/.test(note) ? <Chip tone="info">Needs TV provider</Chip> : null}
+          {/spanish/.test(note) ? <Chip tone="info">Spanish</Chip> : null}
+          {/french/.test(note) ? <Chip tone="info">French</Chip> : null}
+          {o.travelsWithUser ? <Chip tone="free">✈ Travels</Chip> : null}
+          {o.confidence !== "verified" ? <Chip tone="warn">Unverified</Chip> : null}
         </div>
         {o.note ? <p className="mt-0.5 text-xs leading-snug text-muted">{o.note}</p> : null}
       </div>
 
-      {/* watch + source */}
       <div className="flex shrink-0 flex-col items-end gap-1">
         {url ? (
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
+            title={`Open ${o.provider}`}
             onClick={() => track("watch_click", { provider: o.provider, country: countryCode, kind: o.kind })}
             className="rounded-md bg-berry px-3 py-1.5 text-xs font-semibold text-white hover:bg-berry/90"
           >
-            Watch ↗
+            Open ↗
           </a>
         ) : null}
         {o.sourceUrl ? (
-          <a
-            href={o.sourceUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-[10px] text-muted underline hover:text-berry"
-          >
+          <a href={o.sourceUrl} target="_blank" rel="noreferrer" className="text-[10px] text-muted underline hover:text-berry">
             source
           </a>
         ) : null}
@@ -113,7 +150,7 @@ export default function MatchCard({
 
   const cheapestLabel =
     cheapest.kind === "free"
-      ? "FREE"
+      ? "Free"
       : cheapest.kind === "unknown"
         ? "Check local listings"
         : cheapestOpt?.price
@@ -121,17 +158,19 @@ export default function MatchCard({
           : "Subscription";
   const cheapestProvider = cheapestOpt?.provider ?? "no listed option";
 
-  // The headline pill — same legal verdict, styled like the reference (no VPN copy).
+  // The headline answer — names the user's service explicitly.
   type Pill = { tone: "ok" | "warn" | "info"; icon: string; title: string; sub: string };
   let pill: Pill;
   if (verdict.state === "works") {
     pill = {
       tone: "ok",
       icon: "✓",
-      title: "Ready to watch",
+      title: `Ready to watch with ${service!.name}`,
       sub: verdict.portable
-        ? `${service!.name} works here via EU portability`
-        : `Watch on ${verdict.via ?? service!.name}`,
+        ? `Works in ${country.name} via EU portability${verdict.via ? ` — on ${verdict.via}` : ""}`
+        : verdict.via
+          ? `${verdict.via} included in your plan`
+          : `${service!.name} works here`,
     };
   } else if (verdict.state === "blocked") {
     pill = {
@@ -148,15 +187,13 @@ export default function MatchCard({
       sub: cheapest.kind === "unknown" ? "Check local listings" : `Watch on ${cheapestProvider}`,
     };
   } else {
-    // no subscription selected → surface the cheapest legal option
     pill = {
-      tone: cheapest.kind === "free" ? "ok" : cheapest.kind === "unknown" ? "info" : "info",
+      tone: cheapest.kind === "free" ? "ok" : "info",
       icon: cheapest.kind === "free" ? "✓" : "▶",
       title: cheapest.kind === "free" ? "Free to watch" : cheapest.kind === "unknown" ? "Check local listings" : `Cheapest · ${cheapestLabel}`,
       sub: cheapest.kind === "unknown" ? "no verified broadcaster on file" : `on ${cheapestProvider}`,
     };
   }
-  // A finished match can't be watched live — replace the verdict with "Full time".
   if (status === "past") {
     pill = { tone: "info", icon: "⏱", title: "Full time", sub: `kicked off ${localTime} ${localAbbr}` };
   }
@@ -178,12 +215,10 @@ export default function MatchCard({
         status === "past" ? "opacity-70" : ""
       }`}
     >
-      {/* diagonal team-colour accents behind each crest */}
       <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: homeColor, clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
       <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: awayColor, clipPath: "polygon(100% 0, 0 0, 100% 100%)" }} />
 
       <div className="relative px-3 pt-5 sm:px-6 sm:pt-6">
-        {/* crests + center time */}
         <div className="grid grid-cols-[auto_auto_1fr_auto_auto] items-center gap-1 sm:gap-3">
           <div className="flex w-14 flex-col items-center gap-1.5 sm:w-24">
             <Crest flag={match.home.flag} color={homeColor} />
@@ -209,7 +244,6 @@ export default function MatchCard({
           </div>
         </div>
 
-        {/* status pill */}
         <div className={`mx-auto mt-4 flex max-w-md items-center justify-center gap-2.5 rounded-xl border px-4 py-2.5 ${pillClass}`}>
           <span className="text-lg leading-none" aria-hidden>{pill.icon}</span>
           <div className="text-left">
@@ -218,17 +252,15 @@ export default function MatchCard({
           </div>
         </div>
 
-        {/* pipe meta row */}
         <div className="mt-4 border-t border-line pt-2 text-center font-mono text-[10px] uppercase tracking-wide text-muted">
           {localTime} {localAbbr} | {match.stage} | {match.venueCity} | KO {venueTime} local
         </div>
       </div>
 
-      {/* always-visible ways to watch */}
       <div className="relative border-t border-line bg-wash/40 px-3 py-3 sm:px-6">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
-            Ways to watch in {country.name}
+            Ways to watch in {country.name} · <span className="text-free">rights checked {CHECKED}</span>
           </span>
           <button
             onClick={() => {
@@ -236,7 +268,7 @@ export default function MatchCard({
               track("calendar_export", { count: 1, country: country.code, match: match.id });
             }}
             title="Add this match to your calendar"
-            className="font-mono text-[10px] uppercase tracking-wide text-berry hover:underline"
+            className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-berry hover:underline"
           >
             📅 add
           </button>
@@ -249,7 +281,14 @@ export default function MatchCard({
         ) : (
           <ul className="flex flex-col gap-2">
             {options.map((o, i) => (
-              <Option key={`${o.provider}-${i}`} o={o} cheapest={!!cheapestOpt && o === cheapestOpt} countryCode={country.code} />
+              <Option
+                key={`${o.provider}-${i}`}
+                o={o}
+                cheapest={!!cheapestOpt && o === cheapestOpt}
+                countryCode={country.code}
+                serviceCarries={service?.carries ?? []}
+                serviceName={service && service.id !== "none" ? service.name : undefined}
+              />
             ))}
           </ul>
         )}

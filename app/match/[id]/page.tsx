@@ -119,7 +119,9 @@ export default function MatchPage({ params }: { params: { id: string } }) {
             const providers = getOptions(RIGHTS, c.code, m.id).map((o) => o.provider).join(", ");
             return (
               <div key={c.code} className={`flex items-center justify-between gap-3 px-4 py-2.5 ${i ? "border-t border-line" : ""}`}>
-                <span className="shrink-0 font-medium text-ink">{c.flag} {c.name}</span>
+                <Link href={`/watch/${c.code.toLowerCase()}`} className="shrink-0 font-medium text-ink hover:text-berry">
+                  {c.flag} {c.name}
+                </Link>
                 <span className="min-w-0 text-right">
                   <span className={`font-mono text-sm font-semibold ${ch.tone}`}>{ch.text}</span>
                   <span className="block truncate text-xs text-muted">{providers}</span>

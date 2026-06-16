@@ -65,7 +65,10 @@ risk a dead link.
   `SportsEvent` JSON-LD, kickoff times across major timezones, and a where-to-watch table for every
   market. These target "Team vs Team — where to watch / TV channels" long-tail queries.
 - **`/match`** — a static fixtures index linking every match (crawlable internal linking).
-- **`robots.ts` + `sitemap.ts`** — sitemap lists the homepage, the index, and all 72 match pages.
+- **Country pages** — `/watch/[country]` (SSG, one per market) — "How to watch in {country}": channels,
+  the cheapest legal way, and all fixtures in local time. Targets "how to watch in X" queries.
+- **`robots.ts` + `sitemap.ts`** — sitemap lists the homepage, the index, all 72 match pages, and
+  every country page. Set `GOOGLE_SITE_VERIFICATION` in Vercel env to emit the Search Console tag.
 - **OG / Twitter cards** — `app/opengraph-image.tsx` renders a branded card via `next/og`; metadata
   set in `app/layout.tsx`.
 - (Titles are trademark-safe — no "World Cup" — so we forgo those queries but keep the match/country

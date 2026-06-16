@@ -33,6 +33,7 @@ export default function Page() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [now, setNow] = useState<Date | null>(null);
   const [copied, setCopied] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false); // mobile filter drawer
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -176,6 +177,20 @@ export default function Page() {
     }
   };
 
+  const settingsPanel = (
+    <SettingsPanel
+      from={from}
+      service={service}
+      current={current}
+      onFrom={handleFrom}
+      onService={handleService}
+      onCurrent={handleCurrent}
+      teams={teams}
+      onToggle={toggleTeam}
+      onClear={() => setTeams(new Set())}
+    />
+  );
+
   return (
     <main className="mx-auto max-w-6xl px-4 pb-16 lg:px-6">
       {/* brand bar */}
@@ -196,22 +211,27 @@ export default function Page() {
         </button>
       </header>
 
+      {/* mobile: sticky compact filter bar that expands the panel */}
+      <div className="sticky top-0 z-20 -mx-4 mb-3 border-y border-line bg-bg/95 px-4 py-2 backdrop-blur lg:hidden">
+        <button
+          onClick={() => setPanelOpen((o) => !o)}
+          aria-expanded={panelOpen}
+          className="flex w-full items-center justify-between gap-2 text-left"
+        >
+          <span className="truncate font-mono text-[11px] uppercase tracking-wide text-ink">
+            {fromCountry.flag} {fromCountry.demonym} · {svc && svc.id !== "none" ? svc.name : "no sub"} · in {country.name}
+          </span>
+          <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-berry">
+            {panelOpen ? "close ▲" : "edit ▾"}
+          </span>
+        </button>
+        {panelOpen ? <div className="mt-3">{settingsPanel}</div> : null}
+      </div>
+
       <div className="lg:flex lg:items-start lg:gap-6">
-        {/* settings sidebar */}
-        <aside className="lg:w-72 lg:shrink-0">
-          <div className="lg:sticky lg:top-4">
-            <SettingsPanel
-              from={from}
-              service={service}
-              current={current}
-              onFrom={handleFrom}
-              onService={handleService}
-              onCurrent={handleCurrent}
-              teams={teams}
-              onToggle={toggleTeam}
-              onClear={() => setTeams(new Set())}
-            />
-          </div>
+        {/* desktop settings sidebar */}
+        <aside className="hidden lg:block lg:w-72 lg:shrink-0">
+          <div className="lg:sticky lg:top-4">{settingsPanel}</div>
         </aside>
 
         {/* day picker + the selected day's games */}
@@ -298,8 +318,11 @@ export default function Page() {
 
       <footer className="mt-10 border-t border-line pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
         <Link href="/match" className="text-berry hover:underline">All fixtures</Link> ·{" "}
-        <span className="text-free">✓ Rights verified 15 Jun 2026</span> · every claim sourced ·
-        legal paths only · no VPNs · prices change — check the source
+        <Link href={`/watch/${current.toLowerCase()}`} className="text-berry hover:underline">
+          Watch in {country.name}
+        </Link>{" "}
+        · <span className="text-free">✓ Rights verified 15 Jun 2026</span> · every claim sourced ·
+        legal paths only · no VPNs
       </footer>
     </main>
   );

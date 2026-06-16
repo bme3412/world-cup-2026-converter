@@ -56,6 +56,10 @@ export const metadata: Metadata = {
     title: "beautifulgame2026 — where to watch every match",
     description: DESCRIPTION,
   },
+  // Set GOOGLE_SITE_VERIFICATION in Vercel env to emit the Search Console tag.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
