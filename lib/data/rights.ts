@@ -204,6 +204,10 @@ const BASE: Record<string, Opt[]> = {
   ],
 };
 
+// Country-level committed rights, exported for the refresh pipeline's differ.
+export const COUNTRY_RIGHTS = BASE;
+export const VERIFIED_AT = VERIFIED;
+
 function buildRights(): RightsTable {
   const table: RightsTable = {};
   for (const country of Object.keys(BASE)) {

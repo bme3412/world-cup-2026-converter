@@ -1,0 +1,51 @@
+name: Weekly rights refresh
+
+# Re-researches 2026 World Cup broadcast rights for every tracked country,
+# diffs against the committed data, and publishes a review report. Nothing is
+# auto-merged — a human reviews the report and applies verified changes.
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch: # allow manual runs from the Actions tab
+    inputs:
+      countries:
+        description: "Comma-separated country codes (blank = all)"
+        required: false
+        default: ""
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run refresh
+        id: refresh
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.countries }}" ]; then
+            ARGS="-- --countries=${{ github.event.inputs.countries }}"
+          fi
+          npm run refresh $ARGS
+
+      - name: Publish report to job summary
+        if: always()
+        run: cat scripts/refresh/out/report.md >> "$GITHUB_STEP_SUMMARY" || echo "No report produced." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rights-refresh-${{ github.run_id }}
+          path: scripts/refresh/out/
+          retention-days: 30
