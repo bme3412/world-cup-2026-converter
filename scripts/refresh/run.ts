@@ -17,7 +17,8 @@ import { COUNTRY_RIGHTS } from "@/lib/data/rights";
 import type { Country } from "@/lib/types";
 import { researchCountry, type CountryResearch } from "./research";
 import { diffCountry } from "./diff";
-import { renderReport } from "./report";
+import { renderReport, type FixtureReport } from "./report";
+import { checkStructure, crossCheckSchedule } from "./fixtures";
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "out");
 const CONCURRENCY = 4;
@@ -63,19 +64,20 @@ async function main() {
 
   mkdirSync(OUT_DIR, { recursive: true });
 
+  let client: Anthropic | null = null;
   let research: CountryResearch[];
   if (offline) {
-    console.log(`[offline] validating diff machinery against committed data for ${targets.length} countries (no changes expected).`);
+    console.log(`[offline] validating machinery against committed data for ${targets.length} countries (no API calls).`);
     research = targets.map((c) => ({ country: c.code, options: COUNTRY_RIGHTS[c.code], dropped: [] }));
   } else {
     if (!process.env.ANTHROPIC_API_KEY) {
       console.error("ANTHROPIC_API_KEY is not set. Set it, or run with --offline.");
       process.exit(1);
     }
-    const client = new Anthropic();
+    client = new Anthropic();
     console.log(`Researching ${targets.length} countries (concurrency ${CONCURRENCY})…`);
     research = await pool(targets, CONCURRENCY, async (c) => {
-      const r = await researchCountry(client, c, seedSources(c.code), stamp);
+      const r = await researchCountry(client!, c, seedSources(c.code), stamp);
       const status = r.error ? `ERROR ${r.error}` : `${r.options.length} options${r.dropped.length ? `, dropped ${r.dropped.length}` : ""}`;
       console.log(`  ${c.code}: ${status}`);
       return r;
@@ -86,18 +88,27 @@ async function main() {
     diffCountry(r.country, COUNTRY_RIGHTS[r.country] ?? [], r.options, r.error),
   );
 
-  const report = renderReport(diffs, stamp);
+  // Validate fixtures: structure always; schedule cross-check when online.
+  console.log("Validating fixtures…");
+  const fixtures: FixtureReport = {
+    structural: checkStructure(),
+    discrepancies: client ? await crossCheckSchedule(client, 10, new Date(stamp).getTime()) : [],
+  };
+  console.log(`  structure: ${fixtures.structural.length ? `${fixtures.structural.length} issue(s)` : "OK"}; schedule discrepancies: ${fixtures.discrepancies.length}`);
+
+  const report = renderReport(diffs, stamp, fixtures);
   const proposed = Object.fromEntries(research.map((r) => [r.country, r.options]));
 
   writeFileSync(join(OUT_DIR, "report.md"), report);
   writeFileSync(join(OUT_DIR, "proposed-rights.json"), JSON.stringify(proposed, null, 2));
 
   const totalChanges = diffs.reduce((n, d) => n + d.changes.length, 0);
-  console.log(`\nDone. ${totalChanges} proposed change(s). Report: scripts/refresh/out/report.md`);
+  const fixtureIssues = fixtures.structural.length + fixtures.discrepancies.length;
+  console.log(`\nDone. ${totalChanges} rights change(s), ${fixtureIssues} fixture issue(s). Report: scripts/refresh/out/report.md`);
 
   // Expose a one-line summary for CI step output.
   if (process.env.GITHUB_OUTPUT) {
-    writeFileSync(process.env.GITHUB_OUTPUT, `changes=${totalChanges}\n`, { flag: "a" });
+    writeFileSync(process.env.GITHUB_OUTPUT, `changes=${totalChanges}\nfixture_issues=${fixtureIssues}\n`, { flag: "a" });
   }
 }
 

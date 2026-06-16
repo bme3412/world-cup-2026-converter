@@ -10,11 +10,14 @@ function CountryOptions({ label }: { label: (c: Country) => string }) {
     <>
       {countriesByRegion().map((g) => (
         <optgroup key={g.region} label={g.region}>
-          {g.countries.map((c) => (
-            <option key={c.code} value={c.code}>
-              {c.flag} {label(c)}
-            </option>
-          ))}
+          {g.countries
+            .slice()
+            .sort((a, b) => label(a).localeCompare(label(b)))
+            .map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.flag} {label(c)}
+              </option>
+            ))}
         </optgroup>
       ))}
     </>

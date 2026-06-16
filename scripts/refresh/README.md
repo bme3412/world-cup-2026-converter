@@ -17,8 +17,19 @@ npm run refresh -- --offline          # no API calls — exercises the diff mach
 
 Output lands in `scripts/refresh/out/` (git-ignored):
 
-- `report.md` — proposed changes (added / removed / changed providers), per country
+- `report.md` — proposed rights changes per country **+ a Fixtures section**
 - `proposed-rights.json` — the full freshly-researched `WatchOption[]` per country, to copy from
+
+## Fixture validation
+
+Every run also validates fixtures (`fixtures.ts`):
+
+- **Structure** (always, no API) — every group has its 6 matches (72 total), each team plays 3,
+  no duplicate pairings. Same invariants as `npm run check:fixtures`.
+- **Schedule cross-check** (online) — an LLM + web-search pass confirms the kickoff time/venue of
+  each match in the next ~10 days against the official schedule, flagging FIFA reschedules.
+
+Both feed the report's **Fixtures** section; the run exits with a `fixture_issues` count for CI.
 
 ## How it decides
 
