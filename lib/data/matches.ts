@@ -2,7 +2,7 @@ import type { Match } from "@/lib/types";
 import { TEAM_BY_CODE as T } from "@/lib/data/teams";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// REAL 2026 FIFA World Cup group-stage fixtures involving the 16 featured teams.
+// REAL 2026 tournament group-stage fixtures involving the 16 featured teams.
 // Sourced from the English Wikipedia per-group pages (final draw of 5 Dec 2025).
 // Every kickoff is the venue-local time converted to a single UTC ISO string.
 // Knockout fixtures are omitted until the bracket is determined by group results.

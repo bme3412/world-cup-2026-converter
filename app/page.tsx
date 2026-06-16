@@ -139,11 +139,11 @@ export default function Page() {
       <div className="-mx-4 border-b border-berry/15 bg-wash/85 px-4 pb-3 pt-4 backdrop-blur">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl tracking-wide sm:text-3xl">
-              FAR<span className="text-berry">POST</span>
+            <h1 className="font-display text-xl tracking-wide sm:text-2xl">
+              BEAUTIFULGAME<span className="text-berry">2026</span>
             </h1>
             <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">
-              World Cup 2026
+              Summer 2026 · how to watch
             </p>
           </div>
           <button

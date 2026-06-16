@@ -2,12 +2,12 @@ import type { Confidence, Price, RightsTable, WatchOption } from "@/lib/types";
 import { MATCHES } from "@/lib/data/matches";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// REAL 2026 World Cup broadcast rights, country-level (applied to every match).
-// Researched 2026-06-15 from the Wikipedia "2026 FIFA World Cup broadcasting
-// rights" page, FIFA media-rights releases, and broadcaster announcements; each
-// option carries its sourceUrl. This is the seed the refresh pipeline maintains.
+// REAL 2026 tournament broadcast rights, country-level (applied to every match).
+// Researched 2026-06-15 from the relevant broadcasting-rights references, FIFA
+// media-rights releases, and broadcaster announcements; each option carries its
+// sourceUrl. This is the seed the refresh pipeline maintains.
 //
-// Country-level is deliberate: most WC rights are tournament-wide per market.
+// Country-level is deliberate: most rights are tournament-wide per market.
 // Per-match channel splits (which slot on which sister channel) are a later
 // refinement layered as overrides — they don't change the headline answer.
 // ─────────────────────────────────────────────────────────────────────────────

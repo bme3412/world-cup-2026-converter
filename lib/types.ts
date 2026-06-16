@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Far Post — core domain types.
+// beautifulgame2026 — core domain types.
 //
 // The rights data is the real product and the real difficulty. Everything here
 // is shaped so the seed JSON can later be swapped for an API / LLM pipeline

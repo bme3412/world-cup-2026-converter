@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, IBM_Plex_Mono, Hanken_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -21,15 +22,18 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Far Post — where to watch the 2026 World Cup",
+  title: "beautifulgame2026 — where to watch every match",
   description:
-    "A live departures board for the World Cup: every match in your local time with the cheapest legal way to watch it from where you are.",
+    "Every match of the 2026 tournament in your local time, with the cheapest legal way to watch it from wherever you are.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${anton.variable} ${plexMono.variable} ${hanken.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

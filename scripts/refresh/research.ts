@@ -1,5 +1,9 @@
-// Re-research one country's 2026 World Cup broadcast rights via the Anthropic
+// Re-research one country's 2026 tournament broadcast rights via the Anthropic
 // API with the web-search server tool. Returns validated WatchOption[].
+//
+// NOTE: the prompt strings below intentionally keep the official tournament name
+// ("2026 FIFA World Cup") because the web-search queries need it to return
+// accurate rights data. This is internal tooling, never shown in the product.
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { Country, WatchOption } from "@/lib/types";

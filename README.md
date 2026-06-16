@@ -1,8 +1,11 @@
-# Far Post — World Cup 2026 watch engine (Phase 0 MVP)
+# beautifulgame2026 — match watch engine
 
-**"Can I watch this match — where, and for how much?"** Pick your teams, set where you are, and see
-every match in your local time with the cheapest legal way to watch it. Change your location and the
-times, channels and prices all recompute.
+**"Can I watch this match — where, and for how much?"** Tell it your nationality,
+what subscription you have, and where you're watching from. It shows that day's
+matches in your local time with the cheapest legal way to watch — and whether
+your home subscription will work where you are.
+
+Live at **[beautifulgame2026.com](https://beautifulgame2026.com)**.
 
 ## Run it
 
@@ -12,35 +15,34 @@ npm run dev      # http://localhost:3000
 npm run build    # production build (what Vercel runs)
 ```
 
-## Deploy
-
-Push to a Git repo and import it on [Vercel](https://vercel.com/new) — it auto-detects Next.js, no
-config needed. Or `npx vercel` from this directory.
-
 ## How it's built
 
-- **Next.js (App Router) + TypeScript + Tailwind**, no backend (Phase 0 is fully client-side).
+- **Next.js (App Router) + TypeScript + Tailwind**, no backend (the app is fully client-side).
 - **Time is stored once as UTC** (`Match.kickoffUtc`) and rendered per-timezone with
   `Intl.DateTimeFormat`. Local times are never stored — see `lib/time.ts`.
-- **The rights data is the seam.** `lib/types.ts` defines `WatchOption` / `RightsTable` (keyed
-  `country → match`, because channels vary per match within a country). Today it's hand-built sample
-  JSON in `lib/data/`; a later phase swaps that module for an API / LLM pipeline **without touching
-  the UI**.
+- **Rights data is the seam.** `lib/types.ts` defines `WatchOption` / `RightsTable` (keyed
+  `country → match`). It's sourced country-level data in `lib/data/`, each claim carrying a
+  `sourceUrl` + `lastVerifiedUtc`; the UI never depends on how it's produced.
+- **The portability answer** is a rule, not a guess: free-to-air and most pay subscriptions
+  geo-lock abroad, with an EU cross-border-portability carve-out (Reg. 2017/1128) encoded in
+  `serviceVerdict`.
+- **Vercel Analytics** is enabled via `@vercel/analytics` in `app/layout.tsx`.
 
-### Model choices folded in beyond the base spec
+## Coverage
 
-- `WatchOption.travelsWithUser` — does a home subscription keep working abroad? Free-to-air and most
-  home OTT subs are geo-blocked, so this is the honest default and drives the **travel note**.
-- `WatchOption.confidence` (`verified | sample | unknown`) + `lastVerifiedUtc` — trust is shown, not
-  assumed. Unknown match×country combos render **"check local listings"**, never a guess.
-- Shareable **URL state** (`?teams=ARG,POR&loc=US&home=PT`) — every view is a link.
+36 viewing countries across Europe, the Americas, Asia-Pacific, Africa and the Middle East,
+plus the group-stage fixtures of 16 featured teams. Rights are country-level and sourced;
+unknown match×country combinations show "check local listings", never a guess.
+
+## Keeping data current
+
+`scripts/refresh/` is a review-gated weekly pipeline: it re-researches each country's rights
+with the Anthropic API + web search, validates against the `WatchOption` schema, diffs against
+the committed data, and emits a report. It never edits `lib/data/` — a human applies verified
+changes. Runs via `.github/workflows/refresh.yml` (needs an `ANTHROPIC_API_KEY` secret). See
+`scripts/refresh/README.md`.
 
 ## Guardrails
 
 Legal viewing paths only — free-to-air, services that genuinely travel, and where to subscribe
 locally. No VPN / geo-block circumvention. No fabricated rights: unknown is shown as unknown.
-
-## Not yet (Phase 1+)
-
-Live fixtures feed, geolocation, persisted favorites, `.ics` calendar export, and the AI layer
-(natural-language queries + the rights-normalization pipeline).

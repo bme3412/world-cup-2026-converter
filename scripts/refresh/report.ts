@@ -9,7 +9,7 @@ export function renderReport(diffs: CountryDiff[], stampUtc: string): string {
   const totalChanges = withChanges.reduce((n, d) => n + d.changes.length, 0);
 
   const lines: string[] = [];
-  lines.push(`# Far Post — rights refresh report`);
+  lines.push(`# beautifulgame2026 — rights refresh report`);
   lines.push(``);
   lines.push(`Run: ${stampUtc}`);
   lines.push(
