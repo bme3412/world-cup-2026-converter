@@ -30,10 +30,12 @@ npm run build    # production build (what Vercel runs)
 
 ## Coverage
 
-36 viewing countries across Europe, the Americas, Asia-Pacific, Africa and the Middle East.
-All **48 nations** are selectable in the team filter, covering every group-stage fixture in the
-dataset. Rights are country-level and sourced; unknown match×country combinations show "check
-local listings", never a guess. Most options carry a direct **Watch** link to the broadcaster's
+**58 viewing countries** across North & South America, Europe, Africa, the Middle East,
+Asia and Oceania — each with sourced country-level rights. The "I'm from / watching in"
+dropdowns are **grouped by region** (`countriesByRegion()`) so the list stays scannable.
+All **48 nations** are selectable in the team filter (with a **search box**), covering every
+group-stage fixture in the dataset. Unknown match×country combinations show "check local
+listings", never a guess. Most options carry a direct **Watch** link to the broadcaster's
 official streaming page (`lib/data/watchUrls.ts`); a few are omitted rather than risk a dead link.
 
 ## Time-aware day view

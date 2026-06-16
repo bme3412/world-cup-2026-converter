@@ -133,6 +133,49 @@ export const SERVICES: Service[] = [
   // Nigeria
   { id: "ng-nta", name: "NTA (free-to-air)", homeCountry: "NG", travelsAbroad: false, carries: ["NTA"] },
   { id: "ng-supersport", name: "SuperSport (DStv/GOtv)", homeCountry: "NG", travelsAbroad: false, carries: ["SuperSport (DStv/GOtv/Showmax)"] },
+
+  // Romania
+  { id: "ro-antena", name: "Antena 1 (free-to-air)", homeCountry: "RO", travelsAbroad: false, carries: ["Antena 1"] },
+  { id: "ro-antenaplay", name: "AntenaPLAY", homeCountry: "RO", travelsAbroad: false, euPortable: true, carries: ["AntenaPLAY"] },
+  // Czechia
+  { id: "cz-fta", name: "ČT / Nova (free-to-air)", homeCountry: "CZ", travelsAbroad: false, carries: ["Česká televize (ČT)", "TV Nova"] },
+  // Hungary
+  { id: "hu-m4", name: "M4 Sport (free-to-air)", homeCountry: "HU", travelsAbroad: false, carries: ["M4 Sport (MTVA)"] },
+  // Serbia
+  { id: "rs-rts", name: "RTS (free-to-air)", homeCountry: "RS", travelsAbroad: false, carries: ["RTS"] },
+  { id: "rs-arena", name: "Arena Sport", homeCountry: "RS", travelsAbroad: false, carries: ["Arena Sport"] },
+  // Ukraine
+  { id: "ua-megogo", name: "MEGOGO", homeCountry: "UA", travelsAbroad: false, carries: ["MEGOGO", "MEGOGO Sport (free)"] },
+  // United Arab Emirates
+  { id: "ae-bein", name: "beIN Sports / TOD", homeCountry: "AE", travelsAbroad: false, carries: ["beIN Sports", "TOD"] },
+  // Egypt
+  { id: "eg-bein", name: "beIN Sports / TOD", homeCountry: "EG", travelsAbroad: false, carries: ["beIN Sports", "TOD"] },
+  // Israel
+  { id: "il-kan", name: "KAN (free-to-air)", homeCountry: "IL", travelsAbroad: false, carries: ["KAN (Kan 11)"] },
+  { id: "il-charlton", name: "Charlton", homeCountry: "IL", travelsAbroad: false, carries: ["Charlton"] },
+  // Indonesia
+  { id: "id-tvri", name: "TVRI / FolaPlay (free)", homeCountry: "ID", travelsAbroad: false, carries: ["TVRI", "FolaPlay"] },
+  { id: "id-maxstream", name: "MAXstream (Telkomsel)", homeCountry: "ID", travelsAbroad: false, carries: ["MAXstream (Telkomsel)"] },
+  // Thailand
+  { id: "th-jas", name: "Jasmine / MONOMAX", homeCountry: "TH", travelsAbroad: false, carries: ["Jasmine / MONOMAX"] },
+  // Vietnam
+  { id: "vn-vtv", name: "VTV (free-to-air)", homeCountry: "VN", travelsAbroad: false, carries: ["VTV"] },
+  // Philippines
+  { id: "ph-aleph", name: "Aleph Arena (free)", homeCountry: "PH", travelsAbroad: false, carries: ["Aleph Arena (YouTube)"] },
+  { id: "ph-blast", name: "BlastTV", homeCountry: "PH", travelsAbroad: false, carries: ["BlastTV"] },
+  { id: "ph-tap", name: "TAP / Cignal Play", homeCountry: "PH", travelsAbroad: false, carries: ["TAP DMV (Cignal/TapGO)"] },
+  // Malaysia
+  { id: "my-rtm", name: "RTM (free-to-air)", homeCountry: "MY", travelsAbroad: false, carries: ["RTM"] },
+  { id: "my-unifi", name: "Unifi TV", homeCountry: "MY", travelsAbroad: false, carries: ["Unifi TV"] },
+  // Singapore
+  { id: "sg-mediacorp", name: "Mediacorp (free)", homeCountry: "SG", travelsAbroad: false, carries: ["Mediacorp (Channel 5 / mewatch)"] },
+  { id: "sg-mewatch", name: "mewatch All-Access", homeCountry: "SG", travelsAbroad: false, carries: ["mewatch All-Access"] },
+  // Hong Kong
+  { id: "hk-viu", name: "ViuTV (free)", homeCountry: "HK", travelsAbroad: false, carries: ["ViuTV"] },
+  { id: "hk-now", name: "Now TV", homeCountry: "HK", travelsAbroad: false, carries: ["Now TV"] },
+  // New Zealand
+  { id: "nz-tvnz", name: "TVNZ (free-to-air)", homeCountry: "NZ", travelsAbroad: false, carries: ["TVNZ"] },
+  { id: "nz-tvnzplus", name: "TVNZ+ Event Pass", homeCountry: "NZ", travelsAbroad: false, carries: ["TVNZ+ Event Pass"] },
 ];
 
 export const SERVICE_BY_ID: Record<string, Service> = Object.fromEntries(

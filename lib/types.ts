@@ -64,6 +64,15 @@ export type RightsTable = Record<
   Record<string /* matchId */, WatchOption[]>
 >;
 
+export type Region =
+  | "North America"
+  | "South America"
+  | "Europe"
+  | "Africa"
+  | "Middle East"
+  | "Asia"
+  | "Oceania";
+
 export type Country = {
   code: string; // ISO 3166-1 alpha-2, e.g. "US"
   name: string;
@@ -72,4 +81,5 @@ export type Country = {
   tz: string; // representative IANA tz used to render "your local time"
   currency: string; // display currency hint for this market
   isEU: boolean; // EU member → eligible for cross-border portability (Reg. 2017/1128)
+  region: Region; // groups the (growing) country dropdowns
 };

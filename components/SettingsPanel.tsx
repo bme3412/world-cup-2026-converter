@@ -1,8 +1,25 @@
 "use client";
 
-import { COUNTRIES } from "@/lib/data/countries";
+import { countriesByRegion } from "@/lib/data/countries";
+import type { Country } from "@/lib/types";
 import { servicesForCountry } from "@/lib/data/services";
 import TeamStrip from "@/components/TeamStrip";
+
+function CountryOptions({ label }: { label: (c: Country) => string }) {
+  return (
+    <>
+      {countriesByRegion().map((g) => (
+        <optgroup key={g.region} label={g.region}>
+          {g.countries.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {label(c)}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </>
+  );
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -65,11 +82,7 @@ export default function SettingsPanel({
       <div className="flex flex-col gap-3">
         <Field label="I am">
           <Select value={from} onChange={onFrom}>
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.demonym}
-              </option>
-            ))}
+            <CountryOptions label={(c) => c.demonym} />
           </Select>
         </Field>
 
@@ -85,11 +98,7 @@ export default function SettingsPanel({
 
         <Field label="Watching in">
           <Select value={current} onChange={onCurrent}>
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
+            <CountryOptions label={(c) => c.name} />
           </Select>
         </Field>
       </div>

@@ -202,6 +202,75 @@ const BASE: Record<string, Opt[]> = {
     o({ provider: "SuperSport (DStv/GOtv/Showmax)", kind: "paid", delivery: ["tv", "stream"], note: "Primary sub-Saharan rights; all 104 on DStv, GOtv Select & Showmax", source: "https://www.khaspress.com/2026/05/fifa-world-cup-2026-nigeria-broadcast-rights-how-to-watch/" }),
     o({ provider: "StarTimes / SportyTV", kind: "paid", delivery: ["tv", "stream"], confidence: "unknown", note: "Listed on Wikipedia for Nigeria; not corroborated by local trade press", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
   ],
+
+  // ── More Europe ───────────────────────────────────────────────────────────
+  RO: [
+    o({ provider: "Antena 1", kind: "free", delivery: ["tv"], note: "Free-to-air commercial channel; all 104 matches (parallel ties on Antena 3 CNN)", source: "https://antenagroup.ro/ro/stiri/antena-e-fifa-world-cup-in-romania.html" }),
+    o({ provider: "AntenaPLAY", kind: "paid", delivery: ["stream"], price: { amount: 30, currency: "RON", period: "month" }, confidence: "unknown", note: "Streams all 104 matches; approx subscription, not a WC-specific pass", source: "https://www.onlinesport.ro/fotbal/cupa-mondiala-de-fotbal/cm-2026/program-si-cine-transmite-cupa-mondiala-de-fotbal-din-2026-in-romania/" }),
+  ],
+  CZ: [
+    o({ provider: "Česká televize (ČT)", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster (EBU); free-to-air + ČT iVysílání", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+    o({ provider: "TV Nova", kind: "free", delivery: ["tv", "stream"], note: "Commercial free-to-air co-broadcaster; also on Voyo", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+  HU: [
+    o({ provider: "M4 Sport (MTVA)", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all matches free on M4 Sport + Mediaklikk", source: "https://hvg.hu/sport/20241028_mtva-kozmedia-foci-vb-kozvetites" }),
+  ],
+  RS: [
+    o({ provider: "RTS", kind: "free", delivery: ["tv", "stream"], note: "Public free-to-air; 52 of 104 matches (group + all knockouts) on RTS 1/2/3", source: "https://mondo.rs/sport/fudbal/fifa-wc-2026/a2239116/ko-prenosi-svetsko-prvenstvo-2026.html" }),
+    o({ provider: "Arena Sport", kind: "paid", delivery: ["tv", "stream"], note: "Telekom Srbija; exclusive pay holder of all 104 matches", source: "https://direktno.rs/sport/fudbal/695629/svetsko-prvenstvo-tv-prenos-rts-arena-sport.html" }),
+  ],
+  UA: [
+    o({ provider: "MEGOGO Sport (free)", kind: "free", delivery: ["tv"], note: "Selected free matches on T2 digital TV — one/day, opener, 2 QF, both SF, 3rd-place, final", source: "https://champion.com.ua/ukr/football/de-divitisya-chs-2026-z-futbolu-bezplatni-translyaciji-matchiv-na-megogo-1076002/" }),
+    o({ provider: "MEGOGO", kind: "paid", delivery: ["stream", "tv"], note: "Exclusive rights holder; all 104 matches via MEGOGO Sport subscription", source: "https://sport.nv.ua/ukr/chm-2026/chs-2026-hto-v-ukrajini-bude-translyuvati-chempionat-svitu-futbol-pokazhe-megogo-50615269.html" }),
+  ],
+
+  // ── More Middle East ──────────────────────────────────────────────────────
+  AE: [
+    o({ provider: "TOD", kind: "paid", delivery: ["stream"], price: { amount: 586, currency: "AED", period: "tournament" }, note: "beIN's OTT; all 104 matches in 4K — TOD Full Pass (~US$159.99)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+    o({ provider: "beIN Sports", kind: "paid", delivery: ["tv", "stream"], note: "Exclusive MENA pay rights to all 104 matches (satellite, beIN Connect)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+  ],
+  EG: [
+    o({ provider: "beIN Sports", kind: "paid", delivery: ["tv", "stream"], note: "Exclusive MENA pay rights to all 104 matches (satellite, beIN Connect, TOD)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+    o({ provider: "TOD", kind: "paid", delivery: ["stream"], note: "beIN's OTT; all 104 matches (Talabat Pro + TOD bundle ~EGP 1,300/yr)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+  ],
+  IL: [
+    o({ provider: "KAN (Kan 11)", kind: "free", delivery: ["tv", "stream"], note: "Israeli public broadcaster; free-to-air via EBU deal (separate from MENA/beIN)", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+    o({ provider: "Charlton", kind: "paid", delivery: ["tv", "stream"], confidence: "unknown", note: "Local rights-holder; complementary/pay coverage — split not fully confirmed", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+
+  // ── More Asia & Oceania ───────────────────────────────────────────────────
+  ID: [
+    o({ provider: "TVRI", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all 104 matches free on DTT + tvri.go.id", source: "https://inside.fifa.com/news/successful-fifa-world-cup-2026-media-rights-sales-asia" }),
+    o({ provider: "FolaPlay", kind: "free", delivery: ["stream"], note: "Official TVRI OTT partner; live, replay & highlights", source: "https://www.cnnindonesia.com/teknologi/20260610101030-185-1367398/daftar-aplikasi-nonton-streaming-piala-dunia-2026-resmi-dan-legal" }),
+    o({ provider: "MAXstream (Telkomsel)", kind: "paid", delivery: ["stream"], price: { amount: 25000, currency: "IDR", period: "tournament" }, note: "Official OTT; 'Bola Gembira' passes from Rp25,000 (7-day); needs an active Telkomsel number", source: "https://www.cnbcindonesia.com/tech/20260611082553-37-741875/cara-nonton-streaming-piala-dunia-2026-pakai-folaplay-dan-maxstream" }),
+  ],
+  TH: [
+    o({ provider: "Jasmine / MONOMAX", kind: "unknown", delivery: ["tv", "stream"], confidence: "unknown", note: "JAS signed a last-minute deal (11 Jun 2026); free-to-air vs pay/streaming mix not yet finalized", source: "https://en.vietnamplus.vn/thai-broadcaster-secures-fifa-world-cup-2026-rights-at-last-minute-post344438.vnp" }),
+  ],
+  VN: [
+    o({ provider: "VTV", kind: "free", delivery: ["tv", "stream"], note: "Exclusive national rights; all 104 matches free on VTV3/6/10 + VTV digital", source: "https://english.vov.vn/en/sports/vtv-secures-exclusive-broadcast-rights-for-fifa-world-cup-2026-in-vietnam-post1283702.vov" }),
+  ],
+  PH: [
+    o({ provider: "Aleph Arena (YouTube)", kind: "free", delivery: ["stream"], note: "~40 marquee matches free on YouTube with Filipino commentary", source: "https://www.prnewswire.com/apac/news-releases/aleph-launches-first-of-its-kind-multichannel-distribution-model-to-redefine-the-fifa-world-cup-2026-fan-experience-in-the-philippines-302796532.html" }),
+    o({ provider: "BlastTV", kind: "paid", delivery: ["stream"], price: { amount: 1999, currency: "PHP", period: "tournament" }, note: "Premium PPV pass for all 104 matches via app.blasttv.ph", source: "https://techpilipinas.com/how-to-watch-fifa-world-cup-2026-philippines/" }),
+    o({ provider: "TAP DMV (Cignal/TapGO)", kind: "paid", delivery: ["tv", "stream"], note: "TAP-distributed World Cup channels via Cignal Play and TapGO", source: "https://www.philstar.com/sports/2026/05/30/2531641/fifa-world-cup-headed-philippine-screens-after-aleph-tap-dmv-deal" }),
+  ],
+  MY: [
+    o({ provider: "RTM", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; free-to-air majority of matches; free on RTMKlik", source: "https://www.malaymail.com/news/malaysia/2026/06/07/how-malaysians-can-watch-the-fifa-world-cup-2026-a-complete-guide/221841" }),
+    o({ provider: "Unifi TV", kind: "paid", delivery: ["tv", "stream"], price: { amount: 50, currency: "MYR", period: "tournament" }, note: "All 104 matches; season pass RM50 (subscribers), RM20 daily option", source: "https://www.thestar.com.my/lifestyle/entertainment/2026/06/09/unifi-tv-to-broadcast-all-104-fifa-world-cup-2026-matches-live" }),
+  ],
+  SG: [
+    o({ provider: "Mediacorp (Channel 5 / mewatch)", kind: "free", delivery: ["tv", "stream"], note: "28 matches free on Channel 5 + mewatch (opener, group games, SFs, finals)", source: "https://www.businesstoday.com.my/2026/04/02/mediacorp-offering-singaporeans-all-104-world-cup-matches-live-from-s98/" }),
+    o({ provider: "mewatch All-Access", kind: "paid", delivery: ["stream", "tv"], price: { amount: 118, currency: "SGD", period: "tournament" }, note: "All 104 matches on mewatch; also via Singtel & StarHub TV+", source: "https://www.businesstoday.com.my/2026/04/02/mediacorp-offering-singaporeans-all-104-world-cup-matches-live-from-s98/" }),
+  ],
+  HK: [
+    o({ provider: "ViuTV", kind: "free", delivery: ["tv", "stream"], note: "PCCW; 25 matches free incl. opener, SFs & final (Cantonese)", source: "https://www.pccw.com/assets/Common/files/press-release/2026/Feb/Press%20release_Now%20TV%20and%20ViuTV%20to%20exclusively%20broadcast%20the%20FIFA%20World%20Cup%202026%E2%84%A2%20in%20Hong%20Kong_EN.pdf" }),
+    o({ provider: "Now TV", kind: "paid", delivery: ["tv", "stream"], price: { amount: 380, currency: "HKD", period: "tournament" }, note: "PCCW; all 104 matches in 4K — Event Pass HK$380", source: "https://www.pccw.com/assets/Common/files/press-release/2026/May/Press%20release_Now%20TV%20x%20ViuTV%20bring%20FIFA%20World%20Cup%202026%E2%84%A2%20mania%20to%20Hong%20Kong_EN.pdf" }),
+  ],
+  NZ: [
+    o({ provider: "TVNZ", kind: "free", delivery: ["tv", "stream"], note: "22 matches free incl. all NZ games, opener, R16, QF, SF & final on TVNZ 1 / TVNZ+", source: "https://www.1news.co.nz/2026/05/04/defining-moment-tvnz-reveals-fifa-world-cup-event-pass-pricing/" }),
+    o({ provider: "TVNZ+ Event Pass", kind: "paid", delivery: ["stream"], price: { amount: 44.95, currency: "NZD", period: "tournament" }, note: "All 104 matches + daily highlights — one-off NZ$44.95 pass", source: "https://www.1news.co.nz/2026/05/04/defining-moment-tvnz-reveals-fifa-world-cup-event-pass-pricing/" }),
+  ],
 };
 
 // Country-level committed rights, exported for the refresh pipeline's differ.
