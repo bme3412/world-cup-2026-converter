@@ -89,6 +89,119 @@ const BASE: Record<string, Opt[]> = {
     o({ provider: "ABEMA", kind: "free", delivery: ["stream"], confidence: "unknown", note: "Reported free live streaming — not strongly cross-confirmed", source: "https://www.goal.com/en/news/japan-football-tv-schedule/blt19257e33f4c4e273" }),
     o({ provider: "DAZN", kind: "paid", delivery: ["stream"], note: "Pay streaming; all 104 matches (new for 2026)", source: "https://www.sportsvideo.org/2026/06/11/dazn-announces-in-app-features-for-fifa-world-cup-2026-coverage-in-spain-italy-and-japan/" }),
   ],
+
+  // ── Rest of Europe (EU) ───────────────────────────────────────────────────
+  IT: [
+    o({ provider: "RAI", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; 35 selected matches incl. opener, both semis & final; RaiPlay", source: "https://en.ilsole24ore.com/art/to-rai-free-to-air-football-world-cup-2026-broadcasting-rights-AId1GaeB" }),
+    o({ provider: "DAZN", kind: "paid", delivery: ["stream"], price: { amount: 11.99, currency: "EUR", period: "month" }, note: "Full live package — all 104 matches (69 exclusive); 'Start' tier shown", source: "https://dazngroup.com/press-room/in-italy-dazn-will-be-the-only-place-to-watch-the-entire-fifa-world-cup-2026/" }),
+  ],
+  NL: [
+    o({ provider: "NOS (NPO)", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all 104 matches free-to-air on NPO 1 + NPO Start", source: "https://www.goal.com/en/news/watch-live-stream-fifa-world-cup-2026-nos-nederland/bltf3ac51efc9e598dc" }),
+  ],
+  BE: [
+    o({ provider: "VRT (Sporza)", kind: "free", delivery: ["tv", "stream"], note: "Dutch-language public broadcaster; free on VRT 1/Canvas + VRT MAX", source: "https://www.goal.com/en/news/watch-live-stream-belgium-football/blt26f3373e2fbbd352" }),
+    o({ provider: "RTBF (Auvio)", kind: "free", delivery: ["tv", "stream"], note: "French-language public broadcaster; free on RTBF Auvio", source: "https://www.goal.com/en/news/watch-live-stream-belgium-football/blt26f3373e2fbbd352" }),
+  ],
+  IE: [
+    o({ provider: "RTÉ", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all 104 matches free on RTÉ + RTÉ Player (a 'listed event')", source: "https://www.irishtimes.com/business/2026/06/09/the-world-cup-is-still-free-to-watch-in-ireland-but-for-how-much-longer/" }),
+  ],
+  AT: [
+    o({ provider: "ORF", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; 52 matches incl. exclusive opener & final; ORF ON", source: "https://www.horizont.at/medien/news/tv-rechte-magenta-tv-uebertraegt-alle-wm-spiele-101438" }),
+    o({ provider: "ServusTV", kind: "free", delivery: ["tv", "stream"], note: "Red Bull-owned free-to-air; 52 matches; ServusTV On", source: "https://www.horizont.at/medien/news/tv-rechte-magenta-tv-uebertraegt-alle-wm-spiele-101438" }),
+    o({ provider: "Magenta TV WM-Spezial", kind: "paid", delivery: ["tv", "stream"], price: { amount: 19.9, currency: "EUR", period: "tournament" }, note: "One-off pass; all 104 matches + 3 WM channels; no Magenta contract needed", source: "https://newsroom.magenta.at/2026/05/19/magenta-tv-offnet-wm-angebot-fur-ganz-osterreich/" }),
+  ],
+  GR: [
+    o({ provider: "ERT", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; exclusive, all 104 matches on ERT + ERTFLIX", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+  HR: [
+    o({ provider: "HRT", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; exclusive, all 104 matches on HRT2 + HRTi", source: "https://www.livesoccertv.com/competitions/international/world-cup/watch/croatia/" }),
+  ],
+  SE: [
+    o({ provider: "SVT", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; ~23 group matches + Sweden games, free on SVT Play", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+    o({ provider: "TV4", kind: "free", delivery: ["tv", "stream"], note: "Commercial free-to-air; ~49 group matches + the final; no paid tier needed", source: "https://worldcuppass.com/how-to-watch-world-cup-2026-in-sweden/" }),
+  ],
+  DK: [
+    o({ provider: "DR", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; free on DR + DRTV", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+    o({ provider: "TV2", kind: "free", delivery: ["tv", "stream"], note: "Commercial; main-channel matches free-to-air (some on-demand behind TV2 Play)", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+  ],
+  FI: [
+    o({ provider: "Yle", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; free on Yle TV + Yle Areena", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+    o({ provider: "MTV", kind: "paid", delivery: ["tv", "stream"], confidence: "unknown", note: "Co-rights-holder; live coverage reported subscription-based via MTV Katsomo+ — 2026 terms unconfirmed", source: "https://fwctimes.com/finland-football-tv-schedule/" }),
+  ],
+
+  // ── Non-EU Europe ─────────────────────────────────────────────────────────
+  CH: [
+    o({ provider: "SRG SSR (SRF / RTS / RSI)", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all matches free in DE/FR/IT, via Play SRF/RTS/RSI", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+  NO: [
+    o({ provider: "NRK", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; 51 matches incl. final & key Norway games; NRK TV", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+    o({ provider: "TV 2 (TV 2 Play)", kind: "paid", delivery: ["tv", "stream"], note: "Shares matches with NRK; streaming via TV 2 Play subscription", source: "https://inside.fifa.com/tournaments/mens/worldcup/canadamexicousa2026/media-releases/fifa-world-cup-2026-media-rights-awarded-in-the-nordic-territories" }),
+  ],
+  TR: [
+    o({ provider: "TRT (TRT 1 / TRT Spor)", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; all 104 matches free, streaming via Tabii", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+
+  // ── Americas ──────────────────────────────────────────────────────────────
+  AR: [
+    o({ provider: "Telefe", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; ~32 matches incl. Argentina games; Mi Telefe", source: "https://www.ambito.com/deportes/donde-ver-los-104-partidos-del-mundial-y-que-canales-transmiten-los-partidos-argentina" }),
+    o({ provider: "TV Pública", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; ~10 matches", source: "https://www.ambito.com/deportes/donde-ver-los-104-partidos-del-mundial-y-que-canales-transmiten-los-partidos-argentina" }),
+    o({ provider: "TyC Sports", kind: "paid", delivery: ["tv", "stream"], note: "Pay/cable; ~52 matches incl. all Argentina games & final; TyC Sports Play", source: "https://www.ambito.com/deportes/donde-ver-los-104-partidos-del-mundial-y-que-canales-transmiten-los-partidos-argentina" }),
+    o({ provider: "DSports (DirecTV / DGO)", kind: "paid", delivery: ["tv", "stream"], note: "Only signal with all 104 matches; DirecTV + DGO streaming", source: "https://www.ambito.com/deportes/donde-ver-los-104-partidos-del-mundial-y-que-canales-transmiten-los-partidos-argentina" }),
+  ],
+  UY: [
+    o({ provider: "Canal 5 (TNU)", kind: "free", delivery: ["tv"], note: "Public free-to-air; 32 matches incl. Uruguay games, opener & final", source: "https://www.apu.uy/noticias/comienza-el-mundial-canal-5-y-antel-tv-transmitiran-32-partidos-de-forma-gratuita" }),
+    o({ provider: "Antel TV", kind: "free", delivery: ["stream"], note: "State telecom streaming; same 32 free matches, no data charge for Antel users", source: "https://www.apu.uy/noticias/comienza-el-mundial-canal-5-y-antel-tv-transmitiran-32-partidos-de-forma-gratuita" }),
+    o({ provider: "DSports (DirecTV / DGO)", kind: "paid", delivery: ["tv", "stream"], note: "Pay; all 104 matches via DirecTV, DGO & Paramount+", source: "https://www.elobservador.com.uy/cultura-y-espectaculos/donde-se-podra-ver-el-mundial-2026-television-y-streaming-una-guia-las-opciones-disponibles-y-cuantos-partidos-tiene-cada-una-n6038933" }),
+  ],
+  CO: [
+    o({ provider: "Caracol Televisión", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; 35 matches incl. Colombia; Caracol Play / Ditu", source: "https://www.semana.com/deportes/articulo/directv-win-rcn-y-caracol-television-se-repartieron-los-partidos-del-mundial-2026-asi-quedo-la-tabla-completa/202613/" }),
+    o({ provider: "Canal RCN", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; 35 matches incl. Colombia; RCN Total", source: "https://www.semana.com/deportes/articulo/directv-win-rcn-y-caracol-television-se-repartieron-los-partidos-del-mundial-2026-asi-quedo-la-tabla-completa/202613/" }),
+    o({ provider: "Win Sports", kind: "paid", delivery: ["tv", "stream"], note: "Pay; 25 matches; Win Play", source: "https://www.semana.com/deportes/articulo/directv-win-rcn-y-caracol-television-se-repartieron-los-partidos-del-mundial-2026-asi-quedo-la-tabla-completa/202613/" }),
+    o({ provider: "DSports (DirecTV / DGO)", kind: "paid", delivery: ["tv", "stream"], note: "Pay; all 104 matches via DirecTV & DGO", source: "https://www.eltiempo.com/deportes/futbol-internacional/canales-y-paginas-web-que-transmitiran-los-partidos-del-mundial-2026-en-colombia-3563281" }),
+  ],
+  CL: [
+    o({ provider: "Chilevisión", kind: "free", delivery: ["tv", "stream"], note: "Free-to-air; 52 of 104 matches; Chilevisión / Pluto TV", source: "https://es.wikipedia.org/wiki/Anexo:Derechos_de_transmisi%C3%B3n_de_la_Copa_Mundial_de_F%C3%BAtbol_de_2026" }),
+    o({ provider: "DSports (DirecTV / DGO)", kind: "paid", delivery: ["tv", "stream"], price: { amount: 7200, currency: "CLP", period: "month" }, note: "Pay; all 104 matches; DGO cheapest plan ~CLP 7,200/mo", source: "https://bolavip.com/cl/mundial/en-vivo-por-tv-y-streaming-las-3-formas-de-ver-todos-los-partidos-del-mundial-2026-en-chile" }),
+  ],
+
+  // ── Asia-Pacific ──────────────────────────────────────────────────────────
+  AU: [
+    o({ provider: "SBS", kind: "free", delivery: ["tv", "stream"], note: "All 104 matches live & free on SBS, SBS VICELAND & SBS On Demand", source: "https://www.sbs.com.au/sport/fifa-world-cup-2026/how-to-watch" }),
+  ],
+  KR: [
+    o({ provider: "KBS", kind: "free", delivery: ["tv"], note: "Free terrestrial (KBS2), sub-licensed; Korea's group games & the final", source: "https://en.sedaily.com/sports/2026/04/20/kbs-jtbc-strike-deal-to-jointly-broadcast-2026-world-cup" }),
+    o({ provider: "JTBC", kind: "paid", delivery: ["tv"], note: "Primary rights holder; pay channels JTBC, JTBC2/4, Golf&Sports", source: "https://www.koreatimes.co.kr/sports/20260422/world-cup-broadcast-deal-limits-viewing-to-jtbc-kbs-as-talks-collapse-with-mbc-sbs" }),
+    o({ provider: "Naver Sports / CHZZK", kind: "free", delivery: ["stream"], confidence: "unknown", note: "Digital streaming sub-licensed from JTBC (per Wikipedia; not press-confirmed)", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
+  IN: [
+    o({ provider: "Unite8 Sports (Zee)", kind: "paid", delivery: ["tv"], note: "Zee's dedicated TV channels; full coverage (Doordarshan free only for 8 knockout matches)", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+    o({ provider: "ZEE5", kind: "paid", delivery: ["stream"], price: { amount: 799, currency: "INR", period: "tournament" }, note: "Full tournament; ₹799/3 months (ads) or ₹1,699/yr (ad-free)", source: "https://www.business-standard.com/sports/fifa-world-cup/rs-799-to-watch-fifa-world-cup-on-zee5-five-things-fans-must-know-126061100721_1.html" }),
+  ],
+  CN: [
+    o({ provider: "CMG / CCTV", kind: "free", delivery: ["tv", "stream"], note: "Exclusive holder; all 104 matches free on CCTV-5 / CCTV-5+", source: "https://www.sportspro.com/news/broadcast-ott/fifa-world-cup-2026-china-cmg-cctv-rights-deal-may-2026/" }),
+    o({ provider: "Xiaohongshu / RedNote", kind: "free", delivery: ["stream"], note: "Free streaming of all 104 matches + replays/highlights", source: "https://www.yicaiglobal.com/news/xiaohongshu-secures-2026-fifa-world-cup-broadcasting-rights-from-china-state-media" }),
+    o({ provider: "Migu Video", kind: "paid", delivery: ["stream"], note: "China Mobile platform; sub-licensed paid streaming", source: "https://worldcuppass.com/2026-fifa-world-cup-tv-coverage/" }),
+  ],
+
+  // ── Africa & Middle East ──────────────────────────────────────────────────
+  MA: [
+    o({ provider: "SNRT (Al Aoula / Arryadia)", kind: "free", delivery: ["tv", "stream"], note: "National public broadcaster (sub-licensed from beIN); all Morocco games free", source: "https://www.moroccoworldnews.com/2026/06/313289/world-cup-2026-national-tv-secures-broadcasting-rights-for-moroccos-games/" }),
+    o({ provider: "beIN Sports", kind: "paid", delivery: ["tv", "stream"], note: "Exclusive MENA pay rights, all 104 matches (satellite, beIN Connect, TOD)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+  ],
+  ZA: [
+    o({ provider: "SABC", kind: "free", delivery: ["tv", "stream"], note: "Public broadcaster; ~35 matches free incl. all Bafana games, knockouts & final; SABC+", source: "https://www.ewn.co.za/2026/06/09/sabc-to-air-35-fifa-world-cup-matches-for-free-as-dstv-launches-r99-package" }),
+    o({ provider: "SuperSport (DStv)", kind: "paid", delivery: ["tv", "stream"], price: { amount: 99, currency: "ZAR", period: "month" }, note: "All 104 matches on every DStv tier; R99/mo entry package", source: "https://bandwidthblog.co.za/2026/04/18/supersport-fifa-world-cup-2026-south-africa/" }),
+    o({ provider: "SportyTV", kind: "paid", delivery: ["stream", "tv"], note: "Exclusive streaming rights to all 104 matches; on the DStv app", source: "https://news.broadcastmediaafrica.com/2026/04/14/south-africa-sportytv-secures-exclusive-streaming-rights-for-fifa-world-cup-2026/" }),
+  ],
+  SA: [
+    o({ provider: "SSC (Saudi Sports Company)", kind: "free", delivery: ["tv", "stream"], confidence: "unknown", note: "State channel reported to take an FTA package (Saudi games, opener, final) — 2026 deal not officially confirmed", source: "https://www.khaspress.com/2026/06/fifa-world-cup-2026-broadcast-rights-watch-live-saudi-arabia/" }),
+    o({ provider: "beIN Sports", kind: "paid", delivery: ["tv", "stream"], price: { amount: 159.99, currency: "USD", period: "tournament" }, note: "Exclusive MENA rights, all 104 matches; TOD Full Pass ~$159.99 (SAR not published)", source: "https://www.thenationalnews.com/arts-culture/film-tv/2026/06/11/fifa-world-cup-2026-how-to-watch-uae-tv-streaming-channels/" }),
+  ],
+  NG: [
+    o({ provider: "NTA", kind: "free", delivery: ["tv"], note: "Free-to-air; selected marquee matches — opener, Africa/Nigeria fixtures, semis & final", source: "https://www.khaspress.com/2026/05/fifa-world-cup-2026-nigeria-broadcast-rights-how-to-watch/" }),
+    o({ provider: "SuperSport (DStv/GOtv/Showmax)", kind: "paid", delivery: ["tv", "stream"], note: "Primary sub-Saharan rights; all 104 on DStv, GOtv Select & Showmax", source: "https://www.khaspress.com/2026/05/fifa-world-cup-2026-nigeria-broadcast-rights-how-to-watch/" }),
+    o({ provider: "StarTimes / SportyTV", kind: "paid", delivery: ["tv", "stream"], confidence: "unknown", note: "Listed on Wikipedia for Nigeria; not corroborated by local trade press", source: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_broadcasting_rights" }),
+  ],
 };
 
 function buildRights(): RightsTable {
