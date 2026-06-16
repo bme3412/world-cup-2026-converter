@@ -128,6 +128,15 @@ export default function Page() {
     setFrom(code);
     const s = SERVICE_BY_ID[service];
     if (!s || (s.homeCountry !== code && s.id !== "none")) setService(defaultServiceFor(code));
+    track("setup_change", { field: "nationality", value: code });
+  };
+  const handleService = (id: string) => {
+    setService(id);
+    track("setup_change", { field: "service", value: id });
+  };
+  const handleCurrent = (code: string) => {
+    setCurrent(code);
+    track("setup_change", { field: "location", value: code });
   };
 
   const exportCalendar = () => {
@@ -140,7 +149,9 @@ export default function Page() {
   const toggleTeam = (code: string) =>
     setTeams((prev) => {
       const next = new Set(prev);
-      next.has(code) ? next.delete(code) : next.add(code);
+      const added = !next.has(code);
+      added ? next.add(code) : next.delete(code);
+      track("team_filter", { team: code, action: added ? "add" : "remove" });
       return next;
     });
 
@@ -174,7 +185,7 @@ export default function Page() {
             BEAUTIFULGAME<span className="text-berry">2026</span>
           </h1>
           <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">
-            Summer 2026 · how to watch
+            Watch every match, wherever you are
           </p>
         </div>
         <button
@@ -194,8 +205,8 @@ export default function Page() {
               service={service}
               current={current}
               onFrom={handleFrom}
-              onService={setService}
-              onCurrent={setCurrent}
+              onService={handleService}
+              onCurrent={handleCurrent}
               teams={teams}
               onToggle={toggleTeam}
               onClear={() => setTeams(new Set())}

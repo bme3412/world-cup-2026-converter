@@ -47,9 +47,16 @@ risk a dead link.
   group has its 6 matches (72 total), each team plays 3, no duplicate pairings, and every kickoff/
   timezone is valid. It runs as a **`prebuild` gate** (a broken dataset can't deploy) and in CI on
   every push (`.github/workflows/check.yml`). Update its `EXPECTED_*` constants when knockouts land.
-- **Product analytics** — Vercel Analytics custom events trace real usage: `share` (with method
-  native/clipboard + context), `share_failed`, and `watch_click` (which provider/country a user
-  taps). See `app/page.tsx` and `components/MatchCard.tsx`.
+- **Web Analytics** (Vercel, Pro) — `track()` custom events capture real behavior:
+  - `setup_change` — nationality / service / location picked (which markets & subscriptions matter)
+  - `team_filter` — team added/removed
+  - `share` / `share_failed` — method (native/clipboard) + context
+  - `watch_click` — provider / country / kind tapped (demand + dead-link signal)
+  - `calendar_export` — count / country / match
+
+  Page views (including every `/match/[id]`) are tracked automatically. View in **Vercel → Analytics**.
+- **Speed Insights** (Vercel) — real-user Core Web Vitals (LCP, CLS, INP, TTFB) via
+  `@vercel/speed-insights` mounted in `app/layout.tsx`. View in **Vercel → Speed Insights**.
 - **Share** uses the native Web Share sheet on mobile, falling back to clipboard.
 
 ## SEO
