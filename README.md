@@ -30,9 +30,18 @@ npm run build    # production build (what Vercel runs)
 
 ## Coverage
 
-36 viewing countries across Europe, the Americas, Asia-Pacific, Africa and the Middle East,
-plus the group-stage fixtures of 16 featured teams. Rights are country-level and sourced;
-unknown match×country combinations show "check local listings", never a guess.
+36 viewing countries across Europe, the Americas, Asia-Pacific, Africa and the Middle East.
+All **48 nations** are selectable in the team filter, covering every group-stage fixture in the
+dataset. Rights are country-level and sourced; unknown match×country combinations show "check
+local listings", never a guess. Most options carry a direct **Watch** link to the broadcaster's
+official streaming page (`lib/data/watchUrls.ts`); a few are omitted rather than risk a dead link.
+
+## Time-aware day view
+
+Each day shows matches grouped by status: anything **yet to kick off** (or **live**, within ~2h of
+kickoff) is featured prominently at the top; matches that have **already been played** drop below an
+"Already played" divider, dimmed and marked "Full time". The day strip defaults to the first day
+with upcoming matches. Everything derives from the single UTC kickoff and the current clock.
 
 ## Keeping data current
 

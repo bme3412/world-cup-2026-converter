@@ -15,6 +15,14 @@ import { dayKey, formatDateLong } from "@/lib/time";
 const ALL_TEAMS = TEAMS.map((t) => t.code);
 const DEFAULT_COUNTRY = "US";
 const DEFAULT_SERVICE = "ytv";
+const LIVE_WINDOW_MS = 120 * 60 * 1000; // ~2h: a match is "live" within this of kickoff
+
+function matchStatus(kickoffUtc: string, nowMs: number): "upcoming" | "live" | "past" {
+  const diff = nowMs - new Date(kickoffUtc).getTime();
+  if (diff < 0) return "upcoming";
+  if (diff < LIVE_WINDOW_MS) return "live";
+  return "past";
+}
 
 export default function Page() {
   const [teams, setTeams] = useState<Set<string>>(new Set(ALL_TEAMS));
@@ -90,10 +98,13 @@ export default function Page() {
       return;
     }
     if (selectedDay && days.some((d) => d.key === selectedDay)) return;
+    // First day that still has a match yet to kick off — so upcoming games lead.
+    const nowMs = now.getTime();
     const firstUpcoming =
-      (todayKey && days.find((d) => d.key >= todayKey)) || days[days.length - 1];
+      days.find((d) => d.matches.some((m) => new Date(m.kickoffUtc).getTime() >= nowMs)) ||
+      days[days.length - 1];
     setSelectedDay(firstUpcoming.key);
-  }, [days, todayKey, selectedDay, now]);
+  }, [days, selectedDay, now]);
 
   const dayMetas: DayMeta[] = days.map((d) => {
     const date = new Date(d.matches[0].kickoffUtc);
@@ -197,19 +208,55 @@ export default function Page() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-4">
-                {activeDay.matches.map((m) => (
+              {(() => {
+                const nowMs = now.getTime();
+                const withStatus = activeDay.matches.map((m) => ({ m, status: matchStatus(m.kickoffUtc, nowMs) }));
+                const prominent = withStatus.filter((x) => x.status !== "past");
+                const played = withStatus.filter((x) => x.status === "past");
+                const Card = ({ m, status }: { m: (typeof withStatus)[number]["m"]; status: "upcoming" | "live" | "past" }) => (
                   <MatchCard
                     key={m.id}
                     match={m}
                     country={country}
                     fromCountry={fromCountry}
                     service={svc}
+                    status={status}
                     options={getOptions(RIGHTS, current, m.id)}
                     homeOptions={getOptions(RIGHTS, from, m.id)}
                   />
-                ))}
-              </div>
+                );
+                return (
+                  <>
+                    {prominent.length > 0 ? (
+                      <div className="flex flex-col gap-4">
+                        {prominent.map((x) => (
+                          <Card key={x.m.id} m={x.m} status={x.status} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="py-6 text-center font-mono text-sm text-muted">
+                        Every match on this day has kicked off.
+                      </p>
+                    )}
+
+                    {played.length > 0 ? (
+                      <div className="mt-6">
+                        <div className="mb-3 flex items-center gap-3 px-1">
+                          <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
+                            Already played
+                          </span>
+                          <span className="h-px flex-1 bg-line" />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          {played.map((x) => (
+                            <Card key={x.m.id} m={x.m} status="past" />
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                );
+              })()}
             </>
           )}
         </section>

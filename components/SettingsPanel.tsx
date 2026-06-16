@@ -62,11 +62,6 @@ export default function SettingsPanel({
   const myServices = servicesForCountry(from);
   return (
     <div className="rounded-2xl border border-line bg-panel p-4 shadow-sm sm:p-5">
-      <h2 className="mb-4 flex items-center gap-2 font-display text-lg tracking-wide">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-berry text-xs text-white">⚙</span>
-        SETTINGS
-      </h2>
-
       <div className="flex flex-col gap-3">
         <Field label="I am">
           <Select value={from} onChange={onFrom}>

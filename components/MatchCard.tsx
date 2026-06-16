@@ -88,6 +88,7 @@ export default function MatchCard({
   service,
   options,
   homeOptions,
+  status = "upcoming",
 }: {
   match: Match;
   country: Country;
@@ -95,6 +96,7 @@ export default function MatchCard({
   service: Service | null;
   options: WatchOption[];
   homeOptions: WatchOption[];
+  status?: "upcoming" | "live" | "past";
 }) {
   const cheapest = cheapestLegal(options);
   const cheapestOpt = cheapest.kind === "unknown" ? null : cheapest.option;
@@ -151,18 +153,28 @@ export default function MatchCard({
       sub: cheapest.kind === "unknown" ? "no verified broadcaster on file" : `on ${cheapestProvider}`,
     };
   }
+  // A finished match can't be watched live — replace the verdict with "Full time".
+  if (status === "past") {
+    pill = { tone: "info", icon: "⏱", title: "Full time", sub: `kicked off ${localTime} ${localAbbr}` };
+  }
   const pillClass =
-    pill.tone === "ok"
-      ? "border-free/30 bg-free/10 text-free"
-      : pill.tone === "warn"
-        ? "border-gold/30 bg-gold/10 text-gold"
-        : "border-berry/25 bg-berry/[0.07] text-berry";
+    status === "past"
+      ? "border-line bg-wash text-muted"
+      : pill.tone === "ok"
+        ? "border-free/30 bg-free/10 text-free"
+        : pill.tone === "warn"
+          ? "border-gold/30 bg-gold/10 text-gold"
+          : "border-berry/25 bg-berry/[0.07] text-berry";
 
   const homeColor = teamColor(match.home.code);
   const awayColor = teamColor(match.away.code);
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-line bg-panel shadow-sm">
+    <article
+      className={`relative overflow-hidden rounded-2xl border border-line bg-panel shadow-sm ${
+        status === "past" ? "opacity-70" : ""
+      }`}
+    >
       {/* diagonal team-colour accents behind each crest */}
       <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: homeColor, clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
       <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-24 w-24 opacity-90 sm:h-32 sm:w-32" style={{ background: awayColor, clipPath: "polygon(100% 0, 0 0, 100% 100%)" }} />
@@ -176,9 +188,15 @@ export default function MatchCard({
           </div>
           <span className="font-display text-sm text-muted sm:text-base">VS</span>
           <div className="flex flex-col items-center text-center">
+            {status === "live" ? (
+              <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-paid/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-paid">
+                <span className="inline-block h-1.5 w-1.5 animate-glowPulse rounded-full bg-paid" />
+                Live
+              </span>
+            ) : null}
             <div className="font-display text-3xl leading-none text-ink sm:text-[2.5rem]">{localTime}</div>
             <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-muted">
-              {localAbbr} · kicks off {venueTime} local
+              {localAbbr} · KO {venueTime} local
             </div>
           </div>
           <span className="font-display text-sm text-muted sm:text-base">VS</span>

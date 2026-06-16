@@ -1,7 +1,7 @@
 import type { Team } from "@/lib/types";
 
-// The 16 featured teams shown in the filter strip.
-export const TEAMS: Team[] = [
+// The 16 most-followed teams (used elsewhere as a sensible default).
+const FEATURED: Team[] = [
   { code: "ARG", name: "Argentina", flag: "🇦🇷" },
   { code: "BRA", name: "Brazil", flag: "🇧🇷" },
   { code: "FRA", name: "France", flag: "🇫🇷" },
@@ -20,8 +20,7 @@ export const TEAMS: Team[] = [
   { code: "URU", name: "Uruguay", flag: "🇺🇾" },
 ];
 
-// Opponents in the featured teams' groups — needed so matches render, but not
-// shown in the filter strip.
+// The other 32 nations that share groups with the featured teams.
 const OPPONENTS: Team[] = [
   { code: "RSA", name: "South Africa", flag: "🇿🇦" },
   { code: "KOR", name: "South Korea", flag: "🇰🇷" },
@@ -57,6 +56,11 @@ const OPPONENTS: Team[] = [
   { code: "PAN", name: "Panama", flag: "🇵🇦" },
 ];
 
+// All 48 nations, sorted by code — the full filter set.
+export const TEAMS: Team[] = [...FEATURED, ...OPPONENTS].sort((a, b) =>
+  a.code.localeCompare(b.code),
+);
+
 export const TEAM_BY_CODE: Record<string, Team> = Object.fromEntries(
-  [...TEAMS, ...OPPONENTS].map((t) => [t.code, t]),
+  TEAMS.map((t) => [t.code, t]),
 );
