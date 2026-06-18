@@ -5,12 +5,14 @@ import Link from "next/link";
 import { ev, ctxOf, captureEntry } from "@/lib/analytics";
 import { buildCalendar, downloadIcs } from "@/lib/ics";
 import SettingsPanel from "@/components/SettingsPanel";
+import GeoPrompt from "@/components/GeoPrompt";
 import DayStrip, { type DayMeta } from "@/components/DayStrip";
 import MatchCard from "@/components/MatchCard";
 import { MATCHES } from "@/lib/data/matches";
 import { COUNTRY_BY_CODE } from "@/lib/data/countries";
 import { SERVICE_BY_ID, defaultServiceFor } from "@/lib/data/services";
-import { RIGHTS } from "@/lib/data/rights";
+import { RIGHTS, SUPPORTED_COUNTRY_CODES } from "@/lib/data/rights";
+import { readCookie, writeCookie, GEO_COOKIE, LOC_COOKIE } from "@/lib/geo";
 import { getOptions } from "@/lib/watch";
 import { dayKey, formatDateLong } from "@/lib/time";
 
@@ -38,12 +40,20 @@ export default function Page() {
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const t = p.get("teams");
-    const loc = p.get("loc");
+    const loc = p.get("loc")?.toUpperCase() || null;
     const f = p.get("from");
     const svc = p.get("svc");
     if (t) setTeams(new Set(t.split(",").filter(Boolean)));
-    const cur = loc && COUNTRY_BY_CODE[loc] ? loc : DEFAULT_COUNTRY;
+    // Where you're watching from. Precedence: explicit ?loc (deep link / prior
+    // choice carried in the URL) > a persisted manual pick > the edge geo hint > US.
+    // We never server-redirect `/`; geo only personalizes this default.
+    const known = (c?: string | null) => (c && COUNTRY_BY_CODE[c] ? c : null);
+    const cur =
+      known(loc) ?? known(readCookie(LOC_COOKIE)) ?? known(readCookie(GEO_COOKIE)) ?? DEFAULT_COUNTRY;
     setCurrent(cur);
+    // An explicit ?loc is a deliberate choice — persist it so geo won't override it
+    // on the next full navigation (keeps existing ?loc=US marketing links sticky).
+    if (known(loc)) writeCookie(LOC_COOKIE, cur);
     const fromCode = f && COUNTRY_BY_CODE[f] ? f : cur; // default: from = where you are
     setFrom(fromCode);
     const s = svc ? SERVICE_BY_ID[svc] : undefined;
@@ -146,6 +156,7 @@ export default function Page() {
   };
   const handleCurrent = (code: string) => {
     setCurrent(code);
+    writeCookie(LOC_COOKIE, code); // a manual pick is explicit — it sticks over geo
     ev("country_selected", { ...baseCtx, watching_country: code });
   };
 
@@ -216,6 +227,20 @@ export default function Page() {
           {copied ? "copied ✓" : "↗ share"}
         </button>
       </header>
+
+      {/* soft geo prompt: confirms the detected country and links to its full
+          guide — never a redirect, and easy to override. Wait for `now` so it
+          reflects the cookie-resolved country (no hydration flash). Gated to
+          non-US so US visitors see exactly the prior experience; it still shows
+          when current resolves elsewhere via geo, ?loc, or a manual switch. */}
+      {now && current !== DEFAULT_COUNTRY ? (
+        <GeoPrompt
+          country={country}
+          supported={SUPPORTED_COUNTRY_CODES.has(current)}
+          onChange={() => setPanelOpen(true)}
+          onGuide={() => ev("local_guide_clicked", { ...baseCtx, watching_country: current })}
+        />
+      ) : null}
 
       {/* mobile: sticky compact filter bar that expands the panel */}
       <div className="sticky top-0 z-20 -mx-4 mb-3 border-y border-line bg-bg/95 px-4 py-2 backdrop-blur lg:hidden">

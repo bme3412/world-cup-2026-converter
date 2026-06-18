@@ -277,6 +277,11 @@ const BASE: Record<string, Opt[]> = {
 export const COUNTRY_RIGHTS = BASE;
 export const VERIFIED_AT = VERIFIED;
 
+// The markets that have a `/watch/[country]` page (same set `generateStaticParams`
+// builds from). Used by the edge middleware to resolve a geo-detected country to a
+// real page, falling back to US so a visitor never lands on a 404/empty experience.
+export const SUPPORTED_COUNTRY_CODES = new Set(Object.keys(BASE));
+
 function buildRights(): RightsTable {
   const table: RightsTable = {};
   for (const country of Object.keys(BASE)) {
